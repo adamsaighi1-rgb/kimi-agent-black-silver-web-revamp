@@ -123,8 +123,7 @@ coverage
 
 .env
 license.txt
-exports
-.strapi
+exports`r`nimports`r`n.strapi
 dist
 build
 .strapi-updater.json
