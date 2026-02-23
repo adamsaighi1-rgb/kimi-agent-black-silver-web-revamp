@@ -1,4 +1,4 @@
-﻿import type { Locale } from '@/types/content';
+import type { Locale } from '@/types/content';
 
 export const STRAPI_BASE_URL = (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337').replace(/\/$/, '');
 
@@ -35,6 +35,14 @@ interface StrapiSingleResponse {
 }
 
 const LIST_PAGE_SIZE = '100';
+const MAX_FETCH_RETRIES = 3;
+const RETRY_DELAY_MS = 1200;
+const RETRYABLE_STATUS_CODES = new Set([408, 425, 429, 500, 502, 503, 504]);
+
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
 
 const createUrl = (path: string, params: Record<string, string>) => {
   const url = new URL(`${STRAPI_BASE_URL}${path}`);
@@ -47,16 +55,43 @@ const createUrl = (path: string, params: Record<string, string>) => {
 };
 
 const fetchStrapi = async <T>(path: string, params: Record<string, string>, signal?: AbortSignal): Promise<T> => {
-  const response = await fetch(createUrl(path, params), {
-    method: 'GET',
-    signal,
-  });
+  let lastError: Error | null = null;
 
-  if (!response.ok) {
-    throw new Error(`Strapi request failed (${response.status}) for ${path}`);
+  for (let attempt = 1; attempt <= MAX_FETCH_RETRIES; attempt += 1) {
+    try {
+      const response = await fetch(createUrl(path, params), {
+        method: 'GET',
+        signal,
+      });
+
+      if (response.ok) {
+        return (await response.json()) as T;
+      }
+
+      const requestError = new Error(`Strapi request failed (${response.status}) for ${path}`);
+
+      if (!RETRYABLE_STATUS_CODES.has(response.status) || attempt === MAX_FETCH_RETRIES) {
+        throw requestError;
+      }
+
+      lastError = requestError;
+    } catch (error) {
+      if (signal?.aborted) {
+        throw error;
+      }
+
+      const requestError = error instanceof Error ? error : new Error(`Strapi request failed for ${path}`);
+      lastError = requestError;
+
+      if (attempt === MAX_FETCH_RETRIES) {
+        throw requestError;
+      }
+    }
+
+    await sleep(RETRY_DELAY_MS * attempt);
   }
 
-  return (await response.json()) as T;
+  throw lastError ?? new Error(`Strapi request failed for ${path}`);
 };
 
 export const fetchSiteConfig = async (locale: Locale, signal?: AbortSignal): Promise<SiteConfigResponse> => {
@@ -160,14 +195,30 @@ export const fetchFaqCategories = async (locale: Locale, signal?: AbortSignal): 
 };
 
 export const fetchContentBundle = async (locale: Locale, signal?: AbortSignal) => {
-  const [siteConfig, homePage, properties, neighborhoods, blogPosts, faqCategories] = await Promise.all([
-    fetchSiteConfig(locale, signal),
-    fetchHomePage(locale, signal),
-    fetchProperties(locale, signal),
-    fetchNeighborhoods(locale, signal),
-    fetchBlogPosts(locale, signal),
-    fetchFaqCategories(locale, signal),
-  ]);
+  const [siteConfigResult, homePageResult, propertiesResult, neighborhoodsResult, blogPostsResult, faqCategoriesResult] =
+    await Promise.allSettled([
+      fetchSiteConfig(locale, signal),
+      fetchHomePage(locale, signal),
+      fetchProperties(locale, signal),
+      fetchNeighborhoods(locale, signal),
+      fetchBlogPosts(locale, signal),
+      fetchFaqCategories(locale, signal),
+    ]);
+
+  const siteConfig = siteConfigResult.status === 'fulfilled' ? siteConfigResult.value : { data: null };
+  const homePage = homePageResult.status === 'fulfilled' ? homePageResult.value : { data: null };
+  const properties = propertiesResult.status === 'fulfilled' ? propertiesResult.value : { data: [] };
+  const neighborhoods = neighborhoodsResult.status === 'fulfilled' ? neighborhoodsResult.value : { data: [] };
+  const blogPosts = blogPostsResult.status === 'fulfilled' ? blogPostsResult.value : { data: [] };
+  const faqCategories = faqCategoriesResult.status === 'fulfilled' ? faqCategoriesResult.value : { data: [] };
+
+  if (
+    siteConfigResult.status === 'rejected' &&
+    homePageResult.status === 'rejected' &&
+    propertiesResult.status === 'rejected'
+  ) {
+    throw new Error('Strapi is temporarily unavailable. Please retry in a few seconds.');
+  }
 
   return {
     siteConfig,
@@ -179,6 +230,3 @@ export const fetchContentBundle = async (locale: Locale, signal?: AbortSignal) =
     strapiBaseUrl: STRAPI_BASE_URL,
   };
 };
-
-
-
