@@ -1,0 +1,44 @@
+﻿{
+  "kind": "singleType",
+  "collectionName": "site_configs",
+  "info": {
+    "singularName": "site-config",
+    "pluralName": "site-configs",
+    "displayName": "Site Config"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "brandMain": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "brandSuffix": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "brandSubtext": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "phone": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": false } } },
+    "phoneDisplay": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "headerCtaLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "headerCtaHref": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": false } } },
+    "navLinks": { "type": "component", "repeatable": true, "component": "shared.link", "pluginOptions": { "i18n": { "localized": true } } },
+    "socialLinks": { "type": "component", "repeatable": true, "component": "shared.social-link", "pluginOptions": { "i18n": { "localized": true } } },
+    "footerDescription": { "type": "text", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "quickLinksTitle": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "quickLinks": { "type": "component", "repeatable": true, "component": "shared.link", "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredFooterTitle": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "contactTitle": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "contactAddress": { "type": "text", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "contactEmail": { "type": "email", "required": true, "pluginOptions": { "i18n": { "localized": false } } },
+    "appointmentLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "newsletterTitle": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "newsletterText": { "type": "text", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "newsletterPlaceholder": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "newsletterButtonLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "rightsText": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "legalLinks": { "type": "component", "repeatable": true, "component": "shared.link", "pluginOptions": { "i18n": { "localized": true } } },
+    "backToTopLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "loadingText": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } }
+  }
+}

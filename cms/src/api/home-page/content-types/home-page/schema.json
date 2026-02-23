@@ -1,0 +1,86 @@
+﻿{
+  "kind": "singleType",
+  "collectionName": "home_pages",
+  "info": {
+    "singularName": "home-page",
+    "pluralName": "home-pages",
+    "displayName": "Home Page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "heroTitleLine1": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "heroTitleHighlight": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "heroSubtitle": { "type": "text", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "heroBackground": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"], "pluginOptions": { "i18n": { "localized": true } } },
+    "mediaMentionsLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "mediaLogos": { "type": "component", "repeatable": true, "component": "shared.media-logo", "pluginOptions": { "i18n": { "localized": true } } },
+    "scrollLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+
+    "searchTabs": { "type": "json", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "searchFilters": { "type": "component", "repeatable": true, "component": "search.filter", "pluginOptions": { "i18n": { "localized": true } } },
+    "searchButtonLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+
+    "offPlanLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "offPlanTitle": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "offPlanTitleHighlight": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "offPlanFilterChips": { "type": "json", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "offPlanViewAllLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+
+    "aboutLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "aboutTitle": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "aboutTitleHighlight": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "aboutLead": { "type": "text", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "aboutBody": { "type": "text", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "aboutFeatures": { "type": "component", "repeatable": true, "component": "home.about-feature", "pluginOptions": { "i18n": { "localized": true } } },
+    "aboutAdditionalText": { "type": "text", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "aboutCtaLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "aboutImage": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"], "pluginOptions": { "i18n": { "localized": true } } },
+    "aboutImageAlt": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "aboutStats": { "type": "component", "repeatable": true, "component": "shared.stat", "pluginOptions": { "i18n": { "localized": true } } },
+
+    "featuredPropertiesLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredPropertiesTitle": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredPropertiesTitleHighlight": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredBadgeLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+
+    "featuredBannerLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredBannerTitle": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredBannerTitleHighlight": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredBannerDescription": { "type": "text", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredBannerCtaLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredBannerImage": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"], "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredBannerAgent": { "type": "component", "repeatable": false, "component": "shared.agent", "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredBannerStats": { "type": "component", "repeatable": true, "component": "shared.stat", "pluginOptions": { "i18n": { "localized": true } } },
+
+    "neighborhoodsLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "neighborhoodsTitle": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "neighborhoodsTitleHighlight": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "neighborhoodsAreaLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "neighborhoodsListingsLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "neighborhoodsViewAllLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+
+    "blogLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "blogTitle": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "blogTitleHighlight": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "blogViewAllLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "blogReadMoreLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+
+    "faqLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "faqTitle": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "faqTitleHighlight": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "faqDescription": { "type": "text", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "faqContactQuestion": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "faqContactHelp": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "faqContactButton": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+
+    "propertyViewDetailsLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "featuredBannerDiscoverLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } }
+  }
+}

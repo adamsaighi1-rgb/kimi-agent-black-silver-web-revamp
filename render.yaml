@@ -1,0 +1,60 @@
+services:
+  - type: web
+    name: robins-cms
+    env: docker
+    plan: free
+    dockerContext: ./cms
+    dockerfilePath: ./cms/Dockerfile.render
+    autoDeploy: true
+    healthCheckPath: /admin
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 1337
+      - key: PUBLIC_URL
+        sync: false
+      - key: IS_PROXIED
+        value: "true"
+
+      - key: APP_KEYS
+        sync: false
+      - key: API_TOKEN_SALT
+        sync: false
+      - key: ADMIN_JWT_SECRET
+        sync: false
+      - key: TRANSFER_TOKEN_SALT
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+
+      - key: DATABASE_CLIENT
+        value: postgres
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_SSL
+        value: "true"
+      - key: DATABASE_SSL_REJECT_UNAUTHORIZED
+        value: "false"
+
+      - key: STRAPI_DEFAULT_LOCALE
+        value: en
+      - key: SEED_ON_BOOTSTRAP
+        value: "false"
+
+      - key: CORS_ALLOW_ALL
+        value: "false"
+      - key: CORS_ORIGINS
+        sync: false
+
+      - key: CLOUDINARY_NAME
+        sync: false
+      - key: CLOUDINARY_KEY
+        sync: false
+      - key: CLOUDINARY_SECRET
+        sync: false
+
+      - key: REELLY_IMPORT_ON_BOOTSTRAP
+        value: "false"

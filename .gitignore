@@ -1,0 +1,48 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+
+# Build artifacts
+**/dist/
+**/build/
+**/.cache/
+**/.tmp/
+**/.strapi/
+
+# Vite/TS
+*.tsbuildinfo
+
+# Python cache
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files in this repo
+tmp_*.html
+tmp_*.js
+app/preview.log
+app/preview.err.log
+
+# Strapi uploads (if you don't want media binaries in git)
+cms/public/uploads/
+tmp_*.txt
+
+cms/imports/

@@ -1,0 +1,28 @@
+﻿{
+  "kind": "collectionType",
+  "collectionName": "blog_posts",
+  "info": {
+    "singularName": "blog-post",
+    "pluralName": "blog-posts",
+    "displayName": "Blog Post"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "seedKey": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": false } } },
+    "title": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "excerpt": { "type": "text", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "dateLabel": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "readTime": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "category": { "type": "string", "required": true, "pluginOptions": { "i18n": { "localized": true } } },
+    "featured": { "type": "boolean", "default": false, "pluginOptions": { "i18n": { "localized": false } } },
+    "order": { "type": "integer", "default": 0, "pluginOptions": { "i18n": { "localized": false } } },
+    "image": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"], "pluginOptions": { "i18n": { "localized": true } } }
+  }
+}

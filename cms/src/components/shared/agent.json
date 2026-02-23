@@ -1,0 +1,16 @@
+﻿{
+  "collectionName": "components_shared_agents",
+  "info": {
+    "displayName": "Agent"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "title": {
+      "type": "string"
+    }
+  }
+}

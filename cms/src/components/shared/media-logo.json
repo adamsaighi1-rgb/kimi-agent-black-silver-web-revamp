@@ -1,0 +1,17 @@
+﻿{
+  "collectionName": "components_shared_media_logos",
+  "info": {
+    "displayName": "Media Logo"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "widthClass": {
+      "type": "string",
+      "required": true
+    }
+  }
+}
