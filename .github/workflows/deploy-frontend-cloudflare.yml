@@ -30,7 +30,7 @@ jobs:
       - name: Build app
         working-directory: app
         env:
-          VITE_STRAPI_URL: ${{ secrets.VITE_STRAPI_URL }}
+          VITE_STRAPI_URL: https://cozy-boat-050f91caf5.strapiapp.com
           VITE_SITE_URL: ${{ secrets.VITE_SITE_URL }}
         run: npm run build
 
