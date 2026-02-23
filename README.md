@@ -136,3 +136,27 @@ Enable `find/findOne` for:
 - Images missing after restart: ensure Cloudinary env vars are set (free tiers are ephemeral without external media storage).
 - Empty API data: verify Public role permissions in Strapi.
 - First load slow on free tier: Render free services sleep when idle and need cold start.
+## Optional: GitHub Actions auto-deploy
+
+This repo includes:
+
+- `.github/workflows/deploy-frontend-cloudflare.yml`
+- `.github/workflows/deploy-cms-render.yml`
+
+Add these GitHub repository secrets:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_PAGES_PROJECT`
+- `VITE_STRAPI_URL`
+- `VITE_SITE_URL`
+- `RENDER_DEPLOY_HOOK_URL`
+
+Then run workflows from GitHub Actions tab:
+
+1. `Deploy Frontend (Cloudflare Pages)`
+2. `Deploy CMS (Render)`
+
+Note:
+
+- For Render deploy hook, first create the Render service once (Blueprint), then copy its Deploy Hook URL into `RENDER_DEPLOY_HOOK_URL`.
