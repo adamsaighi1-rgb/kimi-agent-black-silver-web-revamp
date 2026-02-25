@@ -244,6 +244,12 @@ export const bootstrapCms = async (strapi: Core.Strapi) => {
     strapi.log.info('SEED_ON_BOOTSTRAP=false, skipping CMS data seeding.');
   }
 
-  await importReellyProperties(strapi);
+  try {
+    await importReellyProperties(strapi);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    strapi.log.error(`Reelly import failed: ${message}`);
+  }
 };
+
 

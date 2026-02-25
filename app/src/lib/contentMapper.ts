@@ -62,6 +62,32 @@ const unwrapArray = (value: unknown): unknown[] => {
     return objectValue.data;
   }
 
+  if (Array.isArray(objectValue.results)) {
+    return objectValue.results;
+  }
+
+  if (Array.isArray(objectValue.items)) {
+    return objectValue.items;
+  }
+
+  if (Array.isArray(objectValue.rows)) {
+    return objectValue.rows;
+  }
+
+  if (Array.isArray(objectValue.list)) {
+    return objectValue.list;
+  }
+
+  const nestedData = asObject(objectValue.data);
+
+  if (Array.isArray(nestedData.results)) {
+    return nestedData.results;
+  }
+
+  if (Array.isArray(nestedData.items)) {
+    return nestedData.items;
+  }
+
   return [];
 };
 
@@ -190,13 +216,19 @@ const mapSourceMediaFiles = (value: unknown) => {
   const rows = unwrapArray(mediaObject.files)
     .map((item) => {
       const entity = asObject(item);
-      const url = optionalTextValue(entity.file);
+      const nestedFile = asObject(entity.file);
+      const nestedUrl = asObject(entity.url);
+      const url =
+        optionalTextValue(entity.file) ??
+        optionalTextValue(entity.url) ??
+        optionalTextValue(nestedFile.url) ??
+        optionalTextValue(nestedUrl.url);
 
       if (!url) {
         return null;
       }
 
-      const mime = optionalTextValue(entity.file_type);
+      const mime = optionalTextValue(entity.file_type) ?? optionalTextValue(entity.mime);
       const baseFile = {
         url,
         name: optionalTextValue(entity.name) ?? 'Brochure',
@@ -540,8 +572,11 @@ const collectProjectImageUrls = (value: unknown, sourceId: number | null) => {
 
   unwrapArray(mediaObject.images).forEach((entry) => {
     const imageObject = asObject(entry);
+    const nestedImage = asObject(imageObject.image);
     addUrl(imageObject.url);
     addUrl(imageObject.file);
+    addUrl(nestedImage.url);
+    addUrl(nestedImage.file);
   });
 
   unwrapArray(mediaObject.files).forEach((entry) => {
@@ -1138,4 +1173,7 @@ export const mapContentBundle = (bundle: {
     faqCategories: mapFaqCategories(bundle.faqCategories),
   };
 };
+
+
+
 

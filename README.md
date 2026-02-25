@@ -89,6 +89,8 @@ For a one-time full Reelly refresh of 10 properties (including payment plans, un
 - `REELLY_LIMIT=10`
 - `REELLY_FETCH_UNITS_BY_BEDROOMS=true`
 - `REELLY_MAX_BEDROOM_FILTER=10`
+- `REELLY_REQUEST_RETRIES=3`
+- `REELLY_REQUEST_RETRY_DELAY_MS=1200`
 
 ### 4) Deploy frontend on Cloudflare Pages
 
@@ -167,3 +169,4 @@ Then run workflows from GitHub Actions tab:
 Note:
 
 - For Render deploy hook, first create the Render service once (Blueprint), then copy its Deploy Hook URL into `RENDER_DEPLOY_HOOK_URL`.
+

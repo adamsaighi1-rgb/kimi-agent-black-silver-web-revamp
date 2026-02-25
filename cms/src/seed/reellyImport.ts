@@ -81,6 +81,9 @@ const REELLY_FETCH_UNITS_BY_BEDROOMS = process.env.REELLY_FETCH_UNITS_BY_BEDROOM
 const REELLY_MAX_BEDROOM_FILTER = Number(process.env.REELLY_MAX_BEDROOM_FILTER ?? '10');
 const REELLY_REQUEST_TIMEOUT_MS = Number(process.env.REELLY_REQUEST_TIMEOUT_MS ?? '30000');
 const REELLY_DOWNLOAD_TIMEOUT_MS = Number(process.env.REELLY_DOWNLOAD_TIMEOUT_MS ?? '90000');
+const REELLY_REQUEST_RETRIES = Math.max(1, Number(process.env.REELLY_REQUEST_RETRIES ?? '3'));
+const REELLY_REQUEST_RETRY_DELAY_MS = Math.max(0, Number(process.env.REELLY_REQUEST_RETRY_DELAY_MS ?? '1200'));
+const RETRYABLE_STATUS_CODES = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 const IMPORT_ROOT = path.resolve(process.cwd(), 'imports', 'reelly');
 const DATA_DIR = path.join(IMPORT_ROOT, 'data');
@@ -225,20 +228,56 @@ const fetchWithTimeout = async (url: string, options: RequestInit | undefined, t
 };
 
 const requestJson = async <T>(url: string, options?: RequestInit): Promise<T> => {
-  const response = await fetchWithTimeout(url, options, REELLY_REQUEST_TIMEOUT_MS);
+  let lastError: Error | null = null;
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`HTTP ${response.status} for ${url}: ${body.slice(0, 400)}`);
+  for (let attempt = 1; attempt <= REELLY_REQUEST_RETRIES; attempt += 1) {
+    try {
+      const response = await fetchWithTimeout(url, options, REELLY_REQUEST_TIMEOUT_MS);
+
+      if (!response.ok) {
+        const body = await response.text();
+        const error = new Error(`HTTP ${response.status} for ${url}: ${body.slice(0, 400)}`);
+
+        if (attempt < REELLY_REQUEST_RETRIES && RETRYABLE_STATUS_CODES.has(response.status)) {
+          lastError = error;
+          if (REELLY_REQUEST_RETRY_DELAY_MS > 0) {
+            await pause(REELLY_REQUEST_RETRY_DELAY_MS * attempt);
+          }
+          continue;
+        }
+
+        throw error;
+      }
+
+      return (await response.json()) as T;
+    } catch (error) {
+      const requestError = error instanceof Error ? error : new Error(String(error));
+      const isAbort = requestError.name === 'AbortError';
+      const isNetworkFailure = /fetch failed|network|timed out|econn|socket|enotfound/i.test(requestError.message);
+
+      if (attempt < REELLY_REQUEST_RETRIES && (isAbort || isNetworkFailure)) {
+        lastError = requestError;
+        if (REELLY_REQUEST_RETRY_DELAY_MS > 0) {
+          await pause(REELLY_REQUEST_RETRY_DELAY_MS * attempt);
+        }
+        continue;
+      }
+
+      throw requestError;
+    }
   }
 
-  return (await response.json()) as T;
+  throw lastError ?? new Error(`Request failed for ${url}`);
 };
 
 const resolveDetailUrl = (id: number) => REELLY_DETAIL_URL.replace('{id}', String(id));
 const resolveMediaUrl = (id: number) => REELLY_MEDIA_URL.replace('{id}', String(id));
 const resolvePaymentPlanUrl = (id: number) => REELLY_PAYMENT_PLAN_URL.replace('{id}', String(id));
 const resolveUnitsUrl = (id: number) => REELLY_UNITS_URL.replace('{id}', String(id));
+
+const asRecord = (value: unknown): Record<string, unknown> => {
+  return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+};
 
 const parseCollectionPayload = (payload: unknown) => {
   if (Array.isArray(payload)) {
@@ -256,13 +295,28 @@ const parseCollectionPayload = (payload: unknown) => {
   }
 
   const entity = payload as Record<string, unknown>;
+  const nestedData = asRecord(entity.data);
   const rawItems = Array.isArray(entity.results)
     ? (entity.results as unknown[])
     : Array.isArray(entity.data)
       ? (entity.data as unknown[])
       : Array.isArray(entity.items)
         ? (entity.items as unknown[])
-        : [];
+        : Array.isArray(entity.units)
+          ? (entity.units as unknown[])
+          : Array.isArray(entity.payment_plan)
+            ? (entity.payment_plan as unknown[])
+            : Array.isArray(entity.paymentPlans)
+              ? (entity.paymentPlans as unknown[])
+              : Array.isArray(entity.rows)
+                ? (entity.rows as unknown[])
+                : Array.isArray(entity.list)
+                  ? (entity.list as unknown[])
+                  : Array.isArray(nestedData.results)
+                    ? (nestedData.results as unknown[])
+                    : Array.isArray(nestedData.items)
+                      ? (nestedData.items as unknown[])
+                      : [];
 
   const items =
     rawItems.length > 0
@@ -310,6 +364,43 @@ const fetchCollectionResults = async (url: string, token: string) => {
   }
 
   return allResults;
+};
+
+const normalizeMediaPayload = (payload: unknown) => {
+  const direct = asRecord(payload);
+
+  if (
+    Array.isArray(direct.images) ||
+    Array.isArray(direct.files) ||
+    Array.isArray(direct.videos) ||
+    Array.isArray(direct.links)
+  ) {
+    return direct;
+  }
+
+  const nestedCandidates = [direct.data, direct.result, direct.media];
+
+  for (const candidate of nestedCandidates) {
+    const nested = asRecord(candidate);
+    if (
+      Array.isArray(nested.images) ||
+      Array.isArray(nested.files) ||
+      Array.isArray(nested.videos) ||
+      Array.isArray(nested.links)
+    ) {
+      return nested;
+    }
+  }
+
+  return direct;
+};
+
+const errorMessage = (reason: unknown) => {
+  if (reason instanceof Error) {
+    return reason.message;
+  }
+
+  return String(reason);
 };
 
 const dedupeCollectionItems = (items: unknown[]) => {
@@ -469,8 +560,11 @@ const collectProjectImageUrls = (project: ReellyProjectDetail) => {
     for (const mediaImage of mediaImages) {
       if (!mediaImage || typeof mediaImage !== 'object') continue;
       const imageObject = mediaImage as Record<string, unknown>;
+      const nestedImage = imageObject.image as Record<string, unknown> | undefined;
       addUrl(imageObject.url);
       addUrl(imageObject.file);
+      addUrl(nestedImage?.url);
+      addUrl(nestedImage?.file);
     }
 
     const mediaFiles = Array.isArray((mediaObject as Record<string, unknown>).files)
@@ -647,10 +741,12 @@ const authenticate = async () => {
 
 const reellyHeaders = (token: string) => ({
   accept: 'application/json',
+  'content-type': 'application/json',
   origin: REELLY_ORIGIN,
   referer: `${REELLY_ORIGIN}/`,
   'user-agent': 'Mozilla/5.0',
   'xano-authorization': token,
+  authorization: `Bearer ${token}`,
 });
 
 const fetchProjectIds = async (token: string, limit: number) => {
@@ -658,19 +754,27 @@ const fetchProjectIds = async (token: string, limit: number) => {
   let nextUrl: string | null = REELLY_LIST_URL;
 
   while (nextUrl && ids.length < limit) {
-    const page = await requestJson<ReellyListResponse>(nextUrl, {
+    const page = await requestJson<unknown>(nextUrl, {
       method: 'GET',
       headers: reellyHeaders(token),
     });
+    const parsedPage = parseCollectionPayload(page);
 
-    for (const project of page.results ?? []) {
-      if (typeof project.id !== 'number') continue;
-      ids.push(project.id);
+    for (const project of parsedPage.items as ReellyProjectSummary[]) {
+      const projectId =
+        typeof project.id === 'number'
+          ? project.id
+          : typeof project.id === 'string'
+            ? Number(project.id)
+            : Number.NaN;
+
+      if (!Number.isFinite(projectId)) continue;
+      ids.push(projectId);
 
       if (ids.length >= limit) break;
     }
 
-    nextUrl = page.next;
+    nextUrl = parsedPage.next;
 
     if (REELLY_PAUSE_MS > 0) {
       await pause(REELLY_PAUSE_MS);
@@ -1050,7 +1154,7 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
     });
 
     const [mediaResult, paymentPlanResult, unitsResult] = await Promise.allSettled([
-      requestJson<Record<string, unknown>>(resolveMediaUrl(id), {
+      requestJson<unknown>(resolveMediaUrl(id), {
         method: 'GET',
         headers: reellyHeaders(token),
       }),
@@ -1059,26 +1163,31 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
     ]);
 
     if (mediaResult.status === 'fulfilled') {
-      (project as Record<string, unknown>).reellyMedia = mediaResult.value;
+      (project as Record<string, unknown>).reellyMedia = normalizeMediaPayload(mediaResult.value);
     } else {
-      strapi.log.warn(`Project ${id}: unable to fetch media endpoint.`);
+      strapi.log.warn(`Project ${id}: unable to fetch media endpoint (${errorMessage(mediaResult.reason)}).`);
       (project as Record<string, unknown>).reellyMedia = {};
     }
 
     if (paymentPlanResult.status === 'fulfilled') {
       (project as Record<string, unknown>).reellyPaymentPlans = paymentPlanResult.value;
     } else {
-      strapi.log.warn(`Project ${id}: unable to fetch payment plan endpoint.`);
+      strapi.log.warn(
+        `Project ${id}: unable to fetch payment plan endpoint (${errorMessage(paymentPlanResult.reason)}).`
+      );
       (project as Record<string, unknown>).reellyPaymentPlans = [];
     }
 
     if (unitsResult.status === 'fulfilled') {
       (project as Record<string, unknown>).reellyUnits = unitsResult.value;
     } else {
-      strapi.log.warn(`Project ${id}: unable to fetch units endpoint.`);
+      strapi.log.warn(`Project ${id}: unable to fetch units endpoint (${errorMessage(unitsResult.reason)}).`);
       (project as Record<string, unknown>).reellyUnits = [];
     }
 
+    const mediaObject = asRecord((project as Record<string, unknown>).reellyMedia);
+    const mediaImageCount = Array.isArray(mediaObject.images) ? (mediaObject.images as unknown[]).length : 0;
+    const mediaFileCount = Array.isArray(mediaObject.files) ? (mediaObject.files as unknown[]).length : 0;
     const paymentPlanCount = Array.isArray((project as Record<string, unknown>).reellyPaymentPlans)
       ? ((project as Record<string, unknown>).reellyPaymentPlans as unknown[]).length
       : 0;
@@ -1086,7 +1195,9 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
       ? ((project as Record<string, unknown>).reellyUnits as unknown[]).length
       : 0;
 
-    strapi.log.info(`Project ${id}: payment plans=${paymentPlanCount}, units=${unitsCount}.`);
+    strapi.log.info(
+      `Project ${id}: media images=${mediaImageCount}, media files=${mediaFileCount}, payment plans=${paymentPlanCount}, units=${unitsCount}.`
+    );
 
     const districtName = normalizeDistrictName(project.district);
 
@@ -1299,4 +1410,12 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
     `Reelly import completed. Imported ${importedProperties.length} projects and ${neighborhoodPayloads.length} neighborhoods.`
   );
 };
+
+
+
+
+
+
+
+
 
