@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -443,6 +443,14 @@ html[data-theme='light'] [class*='text-white/80'],
 html[data-theme='light'] [class*='text-white/90'] {
   color: #4f5a6b !important;
 }
+html[data-theme='light'] [class*='text-[#8f8f8f]'],
+html[data-theme='light'] [class*='text-[#b0b0b0]'],
+html[data-theme='light'] [class*='text-[#b5b5b5]'],
+html[data-theme='light'] [class*='text-[#bbbbbb]'],
+html[data-theme='light'] [class*='text-[#d5d5d5]'],
+html[data-theme='light'] [class*='text-[#d6d6d6]'] {
+  color: #334155 !important;
+}
 
 html[data-theme='light'] [class*='bg-gradient-to-t'][class*='from-[#0a0a0a]'] {
   background-image: none !important;
@@ -518,5 +526,6 @@ html[data-theme='light'] .readable-image-card .image-card-subtitle {
 html[data-theme='light'] .group:hover .image-card-title {
   color: #d4a853 !important;
 }
+
 
 
