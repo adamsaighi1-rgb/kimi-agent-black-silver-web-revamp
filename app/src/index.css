@@ -375,12 +375,12 @@ html[data-theme='light'] {
 }
 
 html[data-theme='light'] body {
-  background: #f3f4f6;
+  background: #e9edf2;
   color: #111827;
 }
 
 html[data-theme='light'] ::-webkit-scrollbar-track {
-  background: #e6eaf0;
+  background: #dde3ea;
 }
 
 html[data-theme='light'] ::-webkit-scrollbar-thumb {
@@ -393,35 +393,35 @@ html[data-theme='light'] ::selection {
 }
 
 html[data-theme='light'] .loading-screen {
-  background: #f3f4f6 !important;
+  background: #e9edf2 !important;
 }
 
 html[data-theme='light'] .glass-card {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(246, 248, 251, 0.94);
   border-color: rgba(212, 168, 83, 0.28);
 }
 
 html[data-theme='light'] [class*='bg-[#0a0a0a]'] {
-  background-color: #f3f4f6 !important;
+  background-color: #e9edf2 !important;
 }
 
 html[data-theme='light'] [class*='bg-[#1a1a1a]'],
 html[data-theme='light'] [class*='bg-[#121212]'] {
-  background-color: #ffffff !important;
+  background-color: #f5f7fa !important;
 }
 
 html[data-theme='light'] [class*='bg-[#2d2d2d]'] {
-  background-color: #eef2f7 !important;
+  background-color: #e6ebf2 !important;
 }
 
 html[data-theme='light'] [class*='border-[#333333]'],
 html[data-theme='light'] [class*='border-[#2a2a2a]'],
 html[data-theme='light'] [class*='border-[#555555]'] {
-  border-color: #d9dce3 !important;
+  border-color: #cfd6df !important;
 }
 
 html[data-theme='light'] [class*='text-white'] {
-  color: #111827 !important;
+  color: #1f2937 !important;
 }
 
 html[data-theme='light'] [class*='text-[#888888]'],
@@ -429,15 +429,15 @@ html[data-theme='light'] [class*='text-[#9a9a9a]'],
 html[data-theme='light'] [class*='text-white/70'],
 html[data-theme='light'] [class*='text-white/80'],
 html[data-theme='light'] [class*='text-white/90'] {
-  color: #4b5563 !important;
+  color: #5b6675 !important;
 }
 
 html[data-theme='light'] [class*='bg-gradient-to-t'][class*='from-[#0a0a0a]'] {
-  background-image: linear-gradient(to top, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.1)) !important;
+  background-image: linear-gradient(to top, rgba(233, 237, 242, 0.9), rgba(233, 237, 242, 0.2)) !important;
 }
 
 html[data-theme='light'] [class*='bg-gradient-to-r'][class*='from-[#0a0a0a]'] {
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.15), transparent) !important;
+  background-image: linear-gradient(to right, rgba(233, 237, 242, 0.9), rgba(233, 237, 242, 0.3), transparent) !important;
 }
 
 html[data-theme='light'] [class*='hover:bg-[#2d2d2d]']:hover {
@@ -445,5 +445,5 @@ html[data-theme='light'] [class*='hover:bg-[#2d2d2d]']:hover {
 }
 
 html[data-theme='light'] [class*='hover:border-[#555555]']:hover {
-  border-color: #bcc3cf !important;
+  border-color: #aeb8c6 !important;
 }
