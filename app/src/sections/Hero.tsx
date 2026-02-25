@@ -106,7 +106,7 @@ const Hero = ({ content }: { content: HomePageContent }) => {
       <div ref={contentRef} className="relative z-10 h-full flex flex-col items-center justify-center section-padding text-center">
         <div className="max-w-5xl mx-auto">
           <div ref={headline1Ref} className="overflow-hidden">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight">{content.heroTitleLine1}</h1>
+            <h1 className="hero-title-main text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight">{content.heroTitleLine1}</h1>
           </div>
           <div ref={headline2Ref} className="overflow-hidden mt-2">
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
@@ -114,14 +114,14 @@ const Hero = ({ content }: { content: HomePageContent }) => {
             </h1>
           </div>
 
-          <p ref={subheadlineRef} className="mt-8 text-base sm:text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
+          <p ref={subheadlineRef} className="hero-subtitle mt-8 text-base sm:text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
             {content.heroSubtitle}
           </p>
         </div>
 
         <div ref={mediaRef} className="absolute bottom-32 left-0 right-0 section-padding">
           <div className="flex flex-col items-center">
-            <p className="text-[#888888] text-xs tracking-[0.2em] uppercase mb-6">{content.mediaMentionsLabel}</p>
+            <p className="hero-media-label text-[#888888] text-xs tracking-[0.2em] uppercase mb-6">{content.mediaMentionsLabel}</p>
             <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
               {content.mediaLogos.map((logo) => (
                 <div

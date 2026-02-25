@@ -65,12 +65,38 @@ const Header = ({ config, locale, currency, theme, onLocaleChange, onCurrencyCha
       : 'bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-[#333333]/50'
     : 'bg-transparent';
 
-  const navInactiveClass = theme === 'light' ? 'text-[#374151] hover:text-[#d4a853]' : 'text-white/80 hover:text-[#d4a853]';
-  const controlTextClass = theme === 'light' ? 'text-[#374151]' : 'text-white/80';
+  const isLightTransparentHeader = theme === 'light' && !isScrolled;
+  const navInactiveClass =
+    theme === 'light'
+      ? isLightTransparentHeader
+        ? 'text-white/85 hover:text-[#d4a853]'
+        : 'text-[#374151] hover:text-[#d4a853]'
+      : 'text-white/80 hover:text-[#d4a853]';
+  const controlTextClass =
+    theme === 'light'
+      ? isLightTransparentHeader
+        ? 'text-white/85'
+        : 'text-[#374151]'
+      : 'text-white/80';
   const selectClass =
     theme === 'light'
-      ? 'bg-white border border-[#d9dce3] text-[#111827] text-xs px-2 py-1 rounded-sm focus:outline-none focus:border-[#d4a853]'
+      ? isLightTransparentHeader
+        ? 'bg-[#111827]/70 border border-[#475569] text-white text-xs px-2 py-1 rounded-sm focus:outline-none focus:border-[#d4a853]'
+        : 'bg-white border border-[#d9dce3] text-[#111827] text-xs px-2 py-1 rounded-sm focus:outline-none focus:border-[#d4a853]'
       : 'bg-[#1a1a1a] border border-[#333333] text-white text-xs px-2 py-1 rounded-sm focus:outline-none focus:border-[#d4a853]';
+  const brandMainClass = theme === 'light' && isScrolled ? 'text-[#111827]' : 'text-white';
+  const brandSubClass =
+    theme === 'light'
+      ? isScrolled
+        ? 'text-[#6b7280] text-xs tracking-[0.2em] uppercase hidden sm:block'
+        : 'text-white/70 text-xs tracking-[0.2em] uppercase hidden sm:block'
+      : 'text-[#888888] text-xs tracking-[0.2em] uppercase hidden sm:block';
+  const mobileToggleClass =
+    theme === 'light'
+      ? isLightTransparentHeader
+        ? 'text-white hover:text-[#d4a853]'
+        : 'text-[#111827] hover:text-[#d4a853]'
+      : 'text-white hover:text-[#d4a853]';
 
   return (
     <header
@@ -82,10 +108,10 @@ const Header = ({ config, locale, currency, theme, onLocaleChange, onCurrencyCha
       <div className="h-full section-padding flex items-center justify-between">
         <Link to={APP_ROUTES.home} className="flex items-center gap-1 group">
           <span className={`text-2xl font-bold tracking-wider transition-all duration-300 ${isScrolled ? 'text-xl' : ''}`}>
-            <span className={theme === 'light' ? 'text-[#111827]' : 'text-white'}>{config.brandMain}</span>
+            <span className={brandMainClass}>{config.brandMain}</span>
             <span className="text-[#d4a853]">{config.brandSuffix}</span>
           </span>
-          <span className={theme === 'light' ? 'text-[#6b7280] text-xs tracking-[0.2em] uppercase hidden sm:block' : 'text-[#888888] text-xs tracking-[0.2em] uppercase hidden sm:block'}>
+          <span className={brandSubClass}>
             {config.brandSubtext}
           </span>
         </Link>
@@ -190,7 +216,7 @@ const Header = ({ config, locale, currency, theme, onLocaleChange, onCurrencyCha
 
           <button
             onClick={() => setIsMobileMenuOpen((previous) => !previous)}
-            className={`lg:hidden p-2 ${theme === 'light' ? 'text-[#111827] hover:text-[#d4a853]' : 'text-white hover:text-[#d4a853]'} transition-colors duration-300`}
+            className={`lg:hidden p-2 ${mobileToggleClass} transition-colors duration-300`}
             aria-label="Toggle mobile menu"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

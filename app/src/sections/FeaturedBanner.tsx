@@ -68,11 +68,11 @@ const FeaturedBanner = ({ content }: { content: HomePageContent }) => {
             <span className="text-[#d4a853] text-sm tracking-[0.2em] uppercase font-medium">{content.featuredBannerLabel}</span>
           </div>
 
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+          <h2 className="featured-banner-title text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
             {content.featuredBannerTitle} <span className="text-[#d4a853]">{content.featuredBannerTitleHighlight}</span>
           </h2>
 
-          <p className="text-white/70 text-lg mb-8 max-w-lg">{content.featuredBannerDescription}</p>
+          <p className="featured-banner-copy text-white/70 text-lg mb-8 max-w-lg">{content.featuredBannerDescription}</p>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <div className="flex items-center gap-3">
@@ -80,8 +80,8 @@ const FeaturedBanner = ({ content }: { content: HomePageContent }) => {
                 <User className="w-6 h-6 text-[#d4a853]" />
               </div>
               <div>
-                <p className="text-white font-medium">{content.featuredBannerAgent.name}</p>
-                <p className="text-[#888888] text-sm">{content.featuredBannerAgent.title}</p>
+                <p className="featured-agent-name text-white font-medium">{content.featuredBannerAgent.name}</p>
+                <p className="featured-agent-title text-[#888888] text-sm">{content.featuredBannerAgent.title}</p>
               </div>
             </div>
 
