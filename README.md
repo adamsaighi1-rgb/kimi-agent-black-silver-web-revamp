@@ -83,6 +83,13 @@ Suggested:
 - `SEED_ON_BOOTSTRAP=false` for production
 - `REELLY_IMPORT_ON_BOOTSTRAP=false` unless intentionally importing on every boot
 
+For a one-time full Reelly refresh of 10 properties (including payment plans, units, all project images, brochures):
+
+- `REELLY_IMPORT_ON_BOOTSTRAP=true`
+- `REELLY_LIMIT=10`
+- `REELLY_FETCH_UNITS_BY_BEDROOMS=true`
+- `REELLY_MAX_BEDROOM_FILTER=10`
+
 ### 4) Deploy frontend on Cloudflare Pages
 
 Create a Pages project with:

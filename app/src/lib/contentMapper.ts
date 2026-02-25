@@ -20,6 +20,18 @@ const asObject = (value: unknown): Record<string, unknown> => {
   return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
 };
 
+const asJsonObject = (value: unknown): Record<string, unknown> => {
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      return asObject(parsed);
+    } catch {
+      return {};
+    }
+  }
+
+  return asObject(value);
+};
 const unwrapEntity = (value: unknown): Record<string, unknown> => {
   const objectValue = asObject(value);
   const data = objectValue.data;
@@ -91,6 +103,10 @@ const optionalTextValue = (value: unknown): string | undefined => {
   return trimmed.length > 0 ? trimmed : undefined;
 };
 
+const isPlaceholderAmenityName = (value: string) => {
+  const normalized = value.trim().toLowerCase();
+  return normalized === 'n/a' || normalized === 'na' || normalized === 'unknown' || normalized === '-';
+};
 const normalizePersonName = (value: string) => {
   if (/^maria\s+barlow$/i.test(value.trim())) {
     return 'Hakim ESSAAIDI';
@@ -358,7 +374,7 @@ const parsePriceNumber = (value: string) => {
 };
 
 const resolvePriceAed = (entity: Record<string, unknown>) => {
-  const sourceData = asObject(entity.sourceData);
+  const sourceData = asJsonObject(entity.sourceData);
 
   if (typeof sourceData.min_price === 'number' && Number.isFinite(sourceData.min_price) && sourceData.min_price > 0) {
     return sourceData.min_price;
@@ -857,13 +873,14 @@ const mapProperties = (
     const rawAgent = unwrapEntity(entity.agent);
     const agentName = normalizePersonName(stringValue(rawAgent.name));
     const agentTitle = stringValue(rawAgent.title);
+    const sourceData = asJsonObject(entity.sourceData);
 
-    const amenityDetails = unwrapArray(entity.amenityDetails)
+    const amenityDetailsFromEntity = unwrapArray(entity.amenityDetails)
       .map((amenity) => {
         const amenityEntity = unwrapEntity(amenity);
         const name = stringValue(amenityEntity.name);
 
-        if (!name) {
+        if (!name || isPlaceholderAmenityName(name)) {
           return null;
         }
 
@@ -875,10 +892,62 @@ const mapProperties = (
       })
       .filter((entry): entry is { name: string; iconUrl: string | null; iconLocalPath: string | null } => !!entry);
 
+    const amenityDetailsFromSource = unwrapArray(sourceData.amenities)
+      .map((amenity) => {
+        const amenityEntry = asObject(amenity);
+        const amenityEntity = asObject(amenityEntry.amenity ?? amenityEntry);
+        const iconEntity = asObject(amenityEntity.icon ?? amenityEntry.icon);
+        const name = optionalTextValue(amenityEntity.name) ?? optionalTextValue(amenityEntry.name);
+
+        if (!name || isPlaceholderAmenityName(name)) {
+          return null;
+        }
+
+        const iconUrl =
+          optionalTextValue(iconEntity.url) ??
+          optionalTextValue(amenityEntity.iconUrl) ??
+          optionalTextValue(amenityEntity.icon_url) ??
+          optionalTextValue(amenityEntry.iconUrl) ??
+          optionalTextValue(amenityEntry.icon_url) ??
+          null;
+
+        const iconLocalPath =
+          optionalTextValue(amenityEntity.iconLocalPath) ??
+          optionalTextValue(amenityEntity.icon_local_path) ??
+          optionalTextValue(amenityEntry.iconLocalPath) ??
+          optionalTextValue(amenityEntry.icon_local_path) ??
+          null;
+
+        return {
+          name,
+          iconUrl,
+          iconLocalPath,
+        };
+      })
+      .filter((entry): entry is { name: string; iconUrl: string | null; iconLocalPath: string | null } => !!entry);
+
+    const amenityMap = new Map<string, { name: string; iconUrl: string | null; iconLocalPath: string | null }>();
+    [...amenityDetailsFromSource, ...amenityDetailsFromEntity].forEach((amenity) => {
+      const key = amenity.name.trim().toLowerCase();
+      const existing = amenityMap.get(key);
+
+      if (!existing) {
+        amenityMap.set(key, amenity);
+        return;
+      }
+
+      amenityMap.set(key, {
+        name: existing.name || amenity.name,
+        iconUrl: existing.iconUrl ?? amenity.iconUrl,
+        iconLocalPath: existing.iconLocalPath ?? amenity.iconLocalPath,
+      });
+    });
+
+    const amenityDetails = [...amenityMap.values()];
+
     const image = mediaUrl(entity.image, strapiBaseUrl, '/property-1.jpg', ['medium', 'small', 'thumbnail']);
     const imageLarge = mediaUrl(entity.image, strapiBaseUrl, '/property-1.jpg');
     const galleryMediaUrls = mediaUrls(entity.gallery, strapiBaseUrl, ['large', 'medium']);
-    const sourceData = asObject(entity.sourceData);
     const sourceId = optionalNumberValue(entity.sourceId) ?? optionalNumberValue(sourceData.id);
     const sourceImageUrls = collectProjectImageUrls(sourceData, sourceId);
     const sourceCoverUrl = optionalTextValue(asObject(sourceData.cover_image).url);

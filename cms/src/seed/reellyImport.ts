@@ -65,7 +65,7 @@ type NeighborhoodPayload = {
 };
 
 const REELLY_IMPORT_ENABLED = process.env.REELLY_IMPORT_ON_BOOTSTRAP === 'true';
-const REELLY_LIMIT = Number(process.env.REELLY_LIMIT ?? '50');
+const REELLY_LIMIT = Number(process.env.REELLY_LIMIT ?? '10');
 const REELLY_LOGIN_URL = process.env.REELLY_LOGIN_URL ?? 'https://api.reelly.io/api:sk5LT7jx/auth/login0';
 const REELLY_LIST_URL = process.env.REELLY_LIST_URL ?? 'https://api-reelly.up.railway.app/api/internal/projects?limit=50';
 const REELLY_DETAIL_URL = process.env.REELLY_DETAIL_URL ?? 'https://api-reelly.up.railway.app/api/internal/projects/{id}';
@@ -77,6 +77,8 @@ const REELLY_AUTH_TOKEN = process.env.REELLY_AUTH_TOKEN?.trim() ?? '';
 const REELLY_MEDIA_URL = process.env.REELLY_MEDIA_URL ?? 'https://api-reelly.up.railway.app/api/internal/projects/{id}/media';
 const REELLY_PAYMENT_PLAN_URL = process.env.REELLY_PAYMENT_PLAN_URL ?? 'https://api-reelly.up.railway.app/api/internal/projects/{id}/payment_plan';
 const REELLY_UNITS_URL = process.env.REELLY_UNITS_URL ?? 'https://api-reelly.up.railway.app/api/internal/projects/{id}/units';
+const REELLY_FETCH_UNITS_BY_BEDROOMS = process.env.REELLY_FETCH_UNITS_BY_BEDROOMS !== 'false';
+const REELLY_MAX_BEDROOM_FILTER = Number(process.env.REELLY_MAX_BEDROOM_FILTER ?? '10');
 const REELLY_REQUEST_TIMEOUT_MS = Number(process.env.REELLY_REQUEST_TIMEOUT_MS ?? '30000');
 const REELLY_DOWNLOAD_TIMEOUT_MS = Number(process.env.REELLY_DOWNLOAD_TIMEOUT_MS ?? '90000');
 
@@ -238,18 +240,69 @@ const resolveMediaUrl = (id: number) => REELLY_MEDIA_URL.replace('{id}', String(
 const resolvePaymentPlanUrl = (id: number) => REELLY_PAYMENT_PLAN_URL.replace('{id}', String(id));
 const resolveUnitsUrl = (id: number) => REELLY_UNITS_URL.replace('{id}', String(id));
 
-const fetchPaginatedResults = async (url: string, token: string) => {
+const parseCollectionPayload = (payload: unknown) => {
+  if (Array.isArray(payload)) {
+    return {
+      items: payload,
+      next: null as string | null,
+    };
+  }
+
+  if (!payload || typeof payload !== 'object') {
+    return {
+      items: [] as unknown[],
+      next: null as string | null,
+    };
+  }
+
+  const entity = payload as Record<string, unknown>;
+  const rawItems = Array.isArray(entity.results)
+    ? (entity.results as unknown[])
+    : Array.isArray(entity.data)
+      ? (entity.data as unknown[])
+      : Array.isArray(entity.items)
+        ? (entity.items as unknown[])
+        : [];
+
+  const items =
+    rawItems.length > 0
+      ? rawItems
+      : typeof entity.id === 'number' || typeof entity.id === 'string'
+        ? [entity]
+        : [];
+
+  const next = typeof entity.next === 'string' && entity.next.length > 0 ? entity.next : null;
+
+  return {
+    items,
+    next,
+  };
+};
+
+const fetchCollectionResults = async (url: string, token: string) => {
   const allResults: unknown[] = [];
+  const seenUrls = new Set<string>();
   let nextUrl: string | null = url;
 
   while (nextUrl) {
-    const page = await requestJson<{ next?: string | null; results?: unknown[] }>(nextUrl, {
+    if (seenUrls.has(nextUrl)) {
+      break;
+    }
+
+    seenUrls.add(nextUrl);
+
+    const payload = await requestJson<unknown>(nextUrl, {
       method: 'GET',
       headers: reellyHeaders(token),
     });
 
-    allResults.push(...(Array.isArray(page.results) ? page.results : []));
-    nextUrl = typeof page.next === 'string' && page.next.length > 0 ? page.next : null;
+    const page = parseCollectionPayload(payload);
+
+    if (page.items.length > 0) {
+      allResults.push(...page.items);
+    }
+
+    nextUrl = page.next;
 
     if (REELLY_PAUSE_MS > 0 && nextUrl) {
       await pause(REELLY_PAUSE_MS);
@@ -257,6 +310,99 @@ const fetchPaginatedResults = async (url: string, token: string) => {
   }
 
   return allResults;
+};
+
+const dedupeCollectionItems = (items: unknown[]) => {
+  const byKey = new Map<string, unknown>();
+
+  for (const item of items) {
+    if (!item || typeof item !== 'object') continue;
+
+    const entity = item as Record<string, unknown>;
+    const id = entity.id;
+
+    const key =
+      typeof id === 'number' || typeof id === 'string'
+        ? 'id:' + String(id)
+        : [
+            typeof entity.name === 'string' ? entity.name : '',
+            typeof entity.price === 'number' || typeof entity.price === 'string' ? String(entity.price) : '',
+            typeof entity.size === 'number' || typeof entity.size === 'string' ? String(entity.size) : '',
+            typeof entity.bedrooms === 'number' || typeof entity.bedrooms === 'string' ? String(entity.bedrooms) : '',
+          ].join('|');
+
+    if (!byKey.has(key)) {
+      byKey.set(key, item);
+    }
+  }
+
+  return [...byKey.values()];
+};
+
+const buildUnitsBedrooms = (project: ReellyProjectDetail) => {
+  const values = new Set<number>();
+
+  if (typeof project.min_bedrooms === 'number' && Number.isFinite(project.min_bedrooms) && project.min_bedrooms >= 0) {
+    values.add(Math.round(project.min_bedrooms));
+  }
+
+  const text = (project.unit_types ?? '') + ' ' + (project.name ?? '') + ' ' + (project.short_description ?? '');
+  const matches = text.matchAll(/(\d+)\s*(?:bed|br)/gi);
+
+  for (const match of matches) {
+    const parsed = Number(match[1]);
+    if (Number.isFinite(parsed) && parsed >= 0) {
+      values.add(parsed);
+    }
+  }
+
+  if (/studio/i.test(text)) {
+    values.add(0);
+  }
+
+  for (let bedroom = 0; bedroom <= Math.max(0, REELLY_MAX_BEDROOM_FILTER); bedroom += 1) {
+    values.add(bedroom);
+  }
+
+  return [...values].sort((a, b) => a - b);
+};
+
+const resolveUnitsUrlByBedrooms = (id: number, bedrooms: number) => {
+  const base = resolveUnitsUrl(id);
+
+  try {
+    const url = new URL(base);
+    url.searchParams.set('bedrooms', String(bedrooms));
+    return url.toString();
+  } catch {
+    const joiner = base.includes('?') ? '&' : '?';
+    return base + joiner + 'bedrooms=' + encodeURIComponent(String(bedrooms));
+  }
+};
+
+const fetchUnitsResults = async (project: ReellyProjectDetail, token: string) => {
+  const baseUnits = await fetchCollectionResults(resolveUnitsUrl(project.id), token);
+
+  if (baseUnits.length > 0 || !REELLY_FETCH_UNITS_BY_BEDROOMS) {
+    return dedupeCollectionItems(baseUnits);
+  }
+
+  const bedrooms = buildUnitsBedrooms(project);
+  const allUnits = [...baseUnits];
+
+  for (const bedroom of bedrooms) {
+    const units = await fetchCollectionResults(resolveUnitsUrlByBedrooms(project.id, bedroom), token);
+
+    if (units.length > 0) {
+      allUnits.push(...units);
+    }
+
+    if (REELLY_PAUSE_MS > 0) {
+      await pause(REELLY_PAUSE_MS);
+    }
+  }
+
+  return dedupeCollectionItems(allUnits);
 };
 const isReellyProjectImageUrl = (url: string, projectId: number) => {
   const normalized = url.toLowerCase();
@@ -908,8 +1054,8 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
         method: 'GET',
         headers: reellyHeaders(token),
       }),
-      fetchPaginatedResults(resolvePaymentPlanUrl(id), token),
-      fetchPaginatedResults(resolveUnitsUrl(id), token),
+      fetchCollectionResults(resolvePaymentPlanUrl(id), token),
+      fetchUnitsResults(project, token),
     ]);
 
     if (mediaResult.status === 'fulfilled') {
@@ -932,6 +1078,15 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
       strapi.log.warn(`Project ${id}: unable to fetch units endpoint.`);
       (project as Record<string, unknown>).reellyUnits = [];
     }
+
+    const paymentPlanCount = Array.isArray((project as Record<string, unknown>).reellyPaymentPlans)
+      ? ((project as Record<string, unknown>).reellyPaymentPlans as unknown[]).length
+      : 0;
+    const unitsCount = Array.isArray((project as Record<string, unknown>).reellyUnits)
+      ? ((project as Record<string, unknown>).reellyUnits as unknown[]).length
+      : 0;
+
+    strapi.log.info(`Project ${id}: payment plans=${paymentPlanCount}, units=${unitsCount}.`);
 
     const districtName = normalizeDistrictName(project.district);
 
