@@ -806,7 +806,15 @@ const mapHomePage = (response: HomePageResponse, strapiBaseUrl: string): HomePag
   };
 };
 
-const mapProperties = (response: PropertyResponse, strapiBaseUrl: string): PropertyContent[] => {
+interface MapPropertiesOptions {
+  includeNonOffPlan?: boolean;
+}
+
+const mapProperties = (
+  response: PropertyResponse,
+  strapiBaseUrl: string,
+  options: MapPropertiesOptions = {}
+): PropertyContent[] => {
   const mappedProperties = response.data.map((item) => {
     const entity = unwrapEntity(item);
     const rawAgent = unwrapEntity(entity.agent);
@@ -933,13 +941,17 @@ const mapProperties = (response: PropertyResponse, strapiBaseUrl: string): Prope
     };
   });
 
+  if (options.includeNonOffPlan) {
+    return mappedProperties.filter((property) => Boolean(property.slug || property.sourceUrl || property.seedKey));
+  }
+
   return mappedProperties.filter((property) => property.showInOffPlan && (property.slug || property.sourceUrl));
 };
 export const mapFirstPropertyFromResponse = (
   response: PropertyResponse,
   strapiBaseUrl: string
 ): PropertyContent | null => {
-  const mapped = mapProperties(response, strapiBaseUrl);
+  const mapped = mapProperties(response, strapiBaseUrl, { includeNonOffPlan: true });
   return mapped[0] ?? null;
 };
 const mapNeighborhoods = (response: NeighborhoodResponse, strapiBaseUrl: string): NeighborhoodContent[] => {
@@ -1015,6 +1027,7 @@ export const mapContentBundle = (bundle: {
     faqCategories: mapFaqCategories(bundle.faqCategories),
   };
 };
+
 
 
 

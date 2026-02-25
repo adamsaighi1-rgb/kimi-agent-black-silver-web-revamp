@@ -149,59 +149,76 @@ export const fetchPropertyByIdentifier = async (
   identifier: string,
   signal?: AbortSignal
 ): Promise<PropertyResponse> => {
-  const response = await fetchStrapi<StrapiListResponse>(
+  const normalizedIdentifier = identifier.trim();
+
+  const baseParams: Record<string, string> = {
+    locale,
+    'pagination[pageSize]': '1',
+    'fields[0]': 'seedKey',
+    'fields[1]': 'slug',
+    'fields[2]': 'title',
+    'fields[3]': 'location',
+    'fields[4]': 'price',
+    'fields[5]': 'pricePrefix',
+    'fields[6]': 'priceSuffix',
+    'fields[7]': 'beds',
+    'fields[8]': 'baths',
+    'fields[9]': 'area',
+    'fields[10]': 'typeLabel',
+    'fields[11]': 'statusLabel',
+    'fields[12]': 'featured',
+    'fields[13]': 'showInOffPlan',
+    'fields[14]': 'showInFeaturedCarousel',
+    'fields[15]': 'showInFooter',
+    'fields[16]': 'order',
+    'fields[17]': 'developerName',
+    'fields[18]': 'completionDate',
+    'fields[19]': 'sourceUrl',
+    'fields[20]': 'latitude',
+    'fields[21]': 'longitude',
+    'fields[22]': 'description',
+    'fields[23]': 'sourceId',
+    'fields[24]': 'sourceData',
+    'populate[image][fields][0]': 'url',
+    'populate[image][fields][1]': 'formats',
+    'populate[gallery][fields][0]': 'url',
+    'populate[gallery][fields][1]': 'formats',
+    'populate[generalPlanImage][fields][0]': 'url',
+    'populate[generalPlanImage][fields][1]': 'formats',
+    'populate[developerLogo][fields][0]': 'url',
+    'populate[developerLogo][fields][1]': 'formats',
+    'populate[brokerLogo][fields][0]': 'url',
+    'populate[brokerLogo][fields][1]': 'formats',
+    'populate[brochures][fields][0]': 'url',
+    'populate[brochures][fields][1]': 'name',
+    'populate[brochures][fields][2]': 'mime',
+    'populate[agent][fields][0]': 'name',
+    'populate[agent][fields][1]': 'title',
+  };
+
+  const bySlug = await fetchStrapi<StrapiListResponse>(
     '/api/properties',
     {
-      locale,
-      'pagination[pageSize]': '1',
-      'filters[$or][0][slug][$eq]': identifier,
-      'filters[$or][1][seedKey][$eq]': identifier,
-      'fields[0]': 'seedKey',
-      'fields[1]': 'slug',
-      'fields[2]': 'title',
-      'fields[3]': 'location',
-      'fields[4]': 'price',
-      'fields[5]': 'pricePrefix',
-      'fields[6]': 'priceSuffix',
-      'fields[7]': 'beds',
-      'fields[8]': 'baths',
-      'fields[9]': 'area',
-      'fields[10]': 'typeLabel',
-      'fields[11]': 'statusLabel',
-      'fields[12]': 'featured',
-      'fields[13]': 'showInOffPlan',
-      'fields[14]': 'showInFeaturedCarousel',
-      'fields[15]': 'showInFooter',
-      'fields[16]': 'order',
-      'fields[17]': 'developerName',
-      'fields[18]': 'completionDate',
-      'fields[19]': 'sourceUrl',
-      'fields[20]': 'latitude',
-      'fields[21]': 'longitude',
-      'fields[22]': 'description',
-      'fields[23]': 'sourceId',
-      'fields[24]': 'sourceData',
-      'populate[image][fields][0]': 'url',
-      'populate[image][fields][1]': 'formats',
-      'populate[gallery][fields][0]': 'url',
-      'populate[gallery][fields][1]': 'formats',
-      'populate[generalPlanImage][fields][0]': 'url',
-      'populate[generalPlanImage][fields][1]': 'formats',
-      'populate[developerLogo][fields][0]': 'url',
-      'populate[developerLogo][fields][1]': 'formats',
-      'populate[brokerLogo][fields][0]': 'url',
-      'populate[brokerLogo][fields][1]': 'formats',
-      'populate[brochures][fields][0]': 'url',
-      'populate[brochures][fields][1]': 'name',
-      'populate[brochures][fields][2]': 'mime',
-      'populate[agent][fields][0]': 'name',
-      'populate[agent][fields][1]': 'title',
-      'populate[amenityDetails]': '*',
+      ...baseParams,
+      'filters[slug][$eq]': normalizedIdentifier,
     },
     signal
   );
 
-  return { data: response.data };
+  if (bySlug.data.length > 0) {
+    return { data: bySlug.data };
+  }
+
+  const bySeedKey = await fetchStrapi<StrapiListResponse>(
+    '/api/properties',
+    {
+      ...baseParams,
+      'filters[seedKey][$eq]': normalizedIdentifier,
+    },
+    signal
+  );
+
+  return { data: bySeedKey.data };
 };
 
 export const fetchNeighborhoods = async (locale: Locale, signal?: AbortSignal): Promise<NeighborhoodResponse> => {
