@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { ArrowRight, Brain, HandshakeIcon, Key, Play, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+import { APP_ROUTES } from '@/lib/siteRoutes';
 import type { HomePageContent } from '@/types/content';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -75,10 +77,10 @@ const About = ({ content }: { content: HomePageContent }) => {
           <p className="fade-up text-[#888888] leading-relaxed mb-8">{content.aboutAdditionalText}</p>
 
           <div className="fade-up">
-            <button className="btn-gold inline-flex items-center gap-3 group">
+            <Link to={APP_ROUTES.contact} className="btn-gold inline-flex items-center gap-3 group">
               <span>{content.aboutCtaLabel}</span>
               <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -94,11 +96,15 @@ const About = ({ content }: { content: HomePageContent }) => {
 
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/60 via-transparent to-transparent" />
 
-            <button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-[#d4a853] rounded-full flex items-center justify-center group/btn pulse-gold hover:scale-110 transition-transform duration-300">
+            <Link
+              to={APP_ROUTES.agency}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-[#d4a853] rounded-full flex items-center justify-center group/btn pulse-gold hover:scale-110 transition-transform duration-300"
+              aria-label={content.aboutCtaLabel}
+            >
               <Play className="w-8 h-8 text-[#0a0a0a] ml-1" fill="#0a0a0a" />
               <span className="absolute inset-0 rounded-full border-2 border-[#d4a853] animate-ping opacity-30" />
               <span className="absolute inset-[-10px] rounded-full border border-[#d4a853]/30 animate-ping opacity-20 animation-delay-200" />
-            </button>
+            </Link>
 
             <div className="absolute bottom-6 left-6 right-6 flex justify-between gap-3">
               {content.aboutStats.map((stat) => (

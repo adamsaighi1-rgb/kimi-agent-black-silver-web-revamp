@@ -44,8 +44,14 @@ const FooterLink = ({ href, label }: { href: string; label: string }) => {
     );
   }
 
+  const isHttpLink = /^https?:/i.test(href);
+
   return (
-    <a href={href} className="text-[#888888] hover:text-[#d4a853] transition-colors duration-300 inline-flex items-center gap-2 group">
+    <a
+      href={href}
+      {...(isHttpLink ? { target: '_blank', rel: 'noreferrer' } : {})}
+      className="text-[#888888] hover:text-[#d4a853] transition-colors duration-300 inline-flex items-center gap-2 group"
+    >
       <span className="w-0 h-[1px] bg-[#d4a853] transition-all duration-300 group-hover:w-3" />
       {label}
     </a>
@@ -66,6 +72,15 @@ const Footer = ({ config, footerProperties }: FooterProps) => {
     return config.quickLinks.filter((link) => !isDeprecatedMarketLink(link.href, link.label));
   }, [config.quickLinks]);
 
+  const resolvedSocialLinks = useMemo(() => {
+    return config.socialLinks
+      .map((social) => ({
+        ...social,
+        resolvedHref: resolveCmsHref(social.href, social.label),
+      }))
+      .filter((social) => Boolean(social.resolvedHref));
+  }, [config.socialLinks]);
+
   const addressLines = config.contactAddress.split('\n');
 
   return (
@@ -84,13 +99,29 @@ const Footer = ({ config, footerProperties }: FooterProps) => {
             <p className="text-[#888888] leading-relaxed mb-6">{config.footerDescription}</p>
 
             <div className="flex gap-3">
-              {config.socialLinks.map((social) => {
+              {resolvedSocialLinks.map((social) => {
                 const Icon = socialIconMap[social.platform as keyof typeof socialIconMap] ?? MessageCircle;
+                const socialKey = `${social.platform}-${social.label}`;
+
+                if (isAppRoute(social.resolvedHref)) {
+                  return (
+                    <Link
+                      key={socialKey}
+                      to={social.resolvedHref}
+                      className="w-10 h-10 rounded-full bg-[#1a1a1a] border border-[#333333] flex items-center justify-center text-[#888888] hover:bg-[#d4a853] hover:border-[#d4a853] hover:text-[#0a0a0a] transition-all duration-300 group"
+                      aria-label={social.label}
+                    >
+                      <Icon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+                    </Link>
+                  );
+                }
 
                 return (
                   <a
-                    key={`${social.platform}-${social.label}`}
-                    href={social.href}
+                    key={socialKey}
+                    href={social.resolvedHref}
+                    target="_blank"
+                    rel="noreferrer"
                     className="w-10 h-10 rounded-full bg-[#1a1a1a] border border-[#333333] flex items-center justify-center text-[#888888] hover:bg-[#d4a853] hover:border-[#d4a853] hover:text-[#0a0a0a] transition-all duration-300 group"
                     aria-label={social.label}
                   >
@@ -256,5 +287,6 @@ const Footer = ({ config, footerProperties }: FooterProps) => {
 };
 
 export default Footer;
+
 
 

@@ -29,7 +29,8 @@ const NeighborhoodCard = ({
   const rotation = rotations[index % rotations.length];
 
   return (
-    <div
+    <Link
+      to={APP_ROUTES.sell}
       className={`group relative overflow-hidden rounded-2xl cursor-pointer stagger-item ${
         neighborhood.size === 'large'
           ? 'md:col-span-2 md:row-span-2'
@@ -41,6 +42,7 @@ const NeighborhoodCard = ({
         transform: `rotate(${rotation}deg)`,
         transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
+      aria-label={`${areaLabel}: ${neighborhood.name}`}
     >
       <div className="readable-image-card relative h-full min-h-[250px] md:min-h-[300px] overflow-hidden rounded-2xl" style={{ transform: 'rotate(0deg)' }}>
         <img src={neighborhood.image} alt={neighborhood.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" decoding="async" />
@@ -68,7 +70,7 @@ const NeighborhoodCard = ({
 
         <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-[#d4a853]/30 transition-colors duration-300 pointer-events-none" />
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -114,5 +116,3 @@ const Neighborhoods = ({ content, neighborhoods }: NeighborhoodsProps) => {
 };
 
 export default Neighborhoods;
-
-

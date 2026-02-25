@@ -1,8 +1,10 @@
-﻿import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { MessageCircle, Minus, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+import { APP_ROUTES } from '@/lib/siteRoutes';
 import type { FaqCategoryContent, HomePageContent } from '@/types/content';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -103,7 +105,9 @@ const FAQ = ({ content, categories }: FAQProps) => {
                 <p className="text-[#888888] text-sm">{content.faqContactHelp}</p>
               </div>
             </div>
-            <button className="w-full btn-primary text-sm">{content.faqContactButton}</button>
+            <Link to={APP_ROUTES.contact} className="w-full btn-primary text-sm inline-flex items-center justify-center">
+              {content.faqContactButton}
+            </Link>
           </div>
         </div>
 

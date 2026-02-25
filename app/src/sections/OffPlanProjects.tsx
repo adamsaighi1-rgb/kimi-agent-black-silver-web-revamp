@@ -1,11 +1,11 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, Bed, MapPin, Maximize } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { useCurrency } from '@/context/CurrencyContext';
 import { useLocale } from '@/context/LocaleContext';
 import { formatPriceFromAed } from '@/lib/currency';
-import { propertyDetailsHref } from '@/lib/siteRoutes';
+import { APP_ROUTES, propertyDetailsHref } from '@/lib/siteRoutes';
 import { uiCopy } from '@/lib/uiCopy';
 import type { HomePageContent, PropertyContent } from '@/types/content';
 
@@ -30,11 +30,11 @@ const mapCopy = {
     openMaps: 'Ouvrir dans Maps',
   },
   ar: {
-    title: 'خريطة العقارات',
-    subtitle: 'استكشف العقارات قيد الإنشاء حسب الموقع.',
-    noData: 'لا توجد إحداثيات خريطة للعقارات المطابقة للفلاتر الحالية.',
-    selectHint: 'اختر عقاراً لتركيز الخريطة عليه.',
-    openMaps: 'فتح في الخرائط',
+    title: '\u062e\u0631\u064a\u0637\u0629 \u0627\u0644\u0639\u0642\u0627\u0631\u0627\u062a',
+    subtitle: '\u0627\u0633\u062a\u0643\u0634\u0641 \u0627\u0644\u0639\u0642\u0627\u0631\u0627\u062a \u0642\u064a\u062f \u0627\u0644\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0628 \u0627\u0644\u0645\u0648\u0642\u0639.',
+    noData: '\u0644\u0627 \u062a\u0648\u062c\u062f \u0625\u062d\u062f\u0627\u062b\u064a\u0627\u062a \u062e\u0631\u064a\u0637\u0629 \u0644\u0644\u0639\u0642\u0627\u0631\u0627\u062a \u0627\u0644\u0645\u0637\u0627\u0628\u0642\u0629 \u0644\u0644\u0641\u0644\u0627\u062a\u0631 \u0627\u0644\u062d\u0627\u0644\u064a\u0629.',
+    selectHint: '\u0627\u062e\u062a\u0631 \u0639\u0642\u0627\u0631\u0627\u064b \u0644\u062a\u0631\u0643\u064a\u0632 \u0627\u0644\u062e\u0631\u064a\u0637\u0629 \u0639\u0644\u064a\u0647.',
+    openMaps: '\u0641\u062a\u062d \u0641\u064a \u0627\u0644\u062e\u0631\u0627\u0626\u0637',
   },
 } as const;
 
@@ -137,8 +137,8 @@ const resultCopy: Record<'en' | 'fr' | 'ar', { count: (n: number) => string; emp
     empty: 'Aucun bien ne correspond aux filtres selectionnes.',
   },
   ar: {
-    count: (n) => `${n} عقار`,
-    empty: 'لا توجد عقارات تطابق الفلاتر المحددة.',
+    count: (n) => `${n} \u0639\u0642\u0627\u0631`,
+    empty: '\u0644\u0627 \u062a\u0648\u062c\u062f \u0639\u0642\u0627\u0631\u0627\u062a \u062a\u0637\u0627\u0628\u0642 \u0627\u0644\u0641\u0644\u0627\u062a\u0631 \u0627\u0644\u0645\u062d\u062f\u062f\u0629.',
   },
 };
 
@@ -291,15 +291,16 @@ const OffPlanProjects = ({ content, properties }: OffPlanProjectsProps) => {
       )}
 
       <div className="mt-12 text-center">
-        <button className="btn-primary inline-flex items-center gap-3 group">
+        <Link to={APP_ROUTES.sell} className="btn-primary inline-flex items-center gap-3 group">
           <span>{content.offPlanViewAllLabel}</span>
           <ArrowRight className={`w-4 h-4 transition-transform duration-300 ${dir === 'rtl' ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`} />
-        </button>
+        </Link>
       </div>
     </section>
   );
 };
 
 export default OffPlanProjects;
+
 
 

@@ -23,15 +23,38 @@ const isRentToken = (token: string) => token.includes('lou') || token.includes('
 
 const routeByToken = (token: string) => {
   if (!token) return null;
+
   if (token === 'home' || token === 'accueil') return APP_ROUTES.home;
-  if (token.includes('vend') || token.includes('sell')) return APP_ROUTES.sell;
+
+  if (
+    token.includes('addlisting') ||
+    token.includes('appointment') ||
+    token.includes('book') ||
+    token.includes('contact')
+  ) {
+    return APP_ROUTES.contact;
+  }
+
+  if (
+    token.includes('propertylisting') ||
+    token.includes('offplan') ||
+    token.includes('propert') ||
+    token.includes('vend') ||
+    token.includes('sell') ||
+    token.includes('listing')
+  ) {
+    return APP_ROUTES.sell;
+  }
 
   // Legacy Buy/Rent intents now map to Sell-only experience.
   if (isBuyToken(token) || isRentToken(token)) return APP_ROUTES.sell;
 
-  if (token.includes('agence') || token.includes('agency')) return APP_ROUTES.agency;
-  if (token.includes('blog')) return APP_ROUTES.blog;
-  if (token.includes('contact')) return APP_ROUTES.contact;
+  if (token.includes('agence') || token.includes('agency') || token.includes('team')) return APP_ROUTES.agency;
+  if (token.includes('blog') || token.includes('news') || token.includes('article')) return APP_ROUTES.blog;
+
+  if (token.includes('privacy') || token.includes('terms') || token.includes('legal') || token.includes('policy')) {
+    return APP_ROUTES.contact;
+  }
 
   return null;
 };
@@ -47,7 +70,10 @@ export const isDeprecatedMarketLink = (href: string, label = '') => {
 export const resolveCmsHref = (href: string, label?: string) => {
   const trimmedHref = href.trim();
 
-  if (!trimmedHref) return APP_ROUTES.home;
+  if (!trimmedHref || trimmedHref === '#') {
+    return routeByToken(normalizeToken(label ?? '')) ?? APP_ROUTES.home;
+  }
+
   if (isExternalHref(trimmedHref)) return trimmedHref;
 
   if (INTERNAL_ROUTES.has(trimmedHref)) return trimmedHref;

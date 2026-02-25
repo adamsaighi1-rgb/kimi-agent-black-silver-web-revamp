@@ -1,8 +1,10 @@
-﻿import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { ArrowRight, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+import { APP_ROUTES } from '@/lib/siteRoutes';
 import type { HomePageContent } from '@/types/content';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -85,10 +87,10 @@ const FeaturedBanner = ({ content }: { content: HomePageContent }) => {
               </div>
             </div>
 
-            <button className="btn-gold inline-flex items-center gap-3 group">
+            <Link to={APP_ROUTES.sell} className="btn-gold inline-flex items-center gap-3 group">
               <span>{content.featuredBannerDiscoverLabel || content.featuredBannerCtaLabel}</span>
               <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-            </button>
+            </Link>
           </div>
 
           <div className="mt-12 flex gap-12">
