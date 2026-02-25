@@ -588,8 +588,8 @@ const fallbackSiteConfig: SiteConfigContent = {
   brandSubtext: 'Properties',
   phone: '+971555097657',
   phoneDisplay: '+971 55 509 7657',
-  headerCtaLabel: 'Add Listing',
-  headerCtaHref: '#contact',
+  headerCtaLabel: 'Contact Us',
+  headerCtaHref: '/contact',
   navLinks: [
     { label: 'HOME', href: '#' },
     { label: 'PROPERTY LISTING', href: '#vendre' },
@@ -615,8 +615,8 @@ const fallbackSiteConfig: SiteConfigContent = {
 };
 
 const fallbackHomePage: HomePageContent = {
-  heroTitleLine1: 'REAL ESTATE AGENCY',
-  heroTitleHighlight: 'IN DUBAI',
+  heroTitleLine1: 'ROBINS PROPERTIES',
+  heroTitleHighlight: 'DUBAI',
   heroSubtitle: '',
   heroBackground: '/hero-bg.jpg',
   mediaMentionsLabel: 'Featured in:',
@@ -629,21 +629,21 @@ const fallbackHomePage: HomePageContent = {
   searchButtonLabel: 'Search Properties',
   offPlanLabel: 'Off-Plan Projects',
   offPlanTitle: 'Top off-plan opportunities in Dubai',
-  offPlanTitleHighlight: 'selected by AI',
+  offPlanTitleHighlight: 'by Robins Properties',
   offPlanFilterChips: [],
   offPlanViewAllLabel: 'View All Properties',
   aboutLabel: 'Robins Properties',
-  aboutTitle: 'Agency expertise,',
-  aboutTitleHighlight: 'AI precision',
+  aboutTitle: 'Trusted guidance,',
+  aboutTitleHighlight: 'real results',
   aboutLead: '',
   aboutBody: '',
   aboutFeatures: [],
   aboutAdditionalText: '',
-  aboutCtaLabel: 'Deploy your strategy',
+  aboutCtaLabel: 'Talk to our advisors',
   aboutImage: '/team-photo.jpg',
   aboutImageAlt: 'Robins Properties Team',
   aboutStats: [],
-  featuredPropertiesLabel: 'Selected by AI',
+  featuredPropertiesLabel: 'Selected by Robins',
   featuredPropertiesTitle: 'Project of the',
   featuredPropertiesTitleHighlight: 'month',
   featuredBadgeLabel: 'Featured',
@@ -653,11 +653,11 @@ const fallbackHomePage: HomePageContent = {
   featuredBannerDescription: '',
   featuredBannerCtaLabel: 'Discover More',
   featuredBannerImage: '/featured-property.jpg',
-  featuredBannerAgent: { name: 'Maria Barlow', title: 'Senior Consultant' },
+  featuredBannerAgent: { name: 'Robins Advisory Team', title: 'Property Consultant' },
   featuredBannerStats: [],
   neighborhoodsLabel: 'Where to invest in Dubai',
-  neighborhoodsTitle: 'Best neighborhoods',
-  neighborhoodsTitleHighlight: 'to invest in Dubai',
+  neighborhoodsTitle: 'Top neighborhoods',
+  neighborhoodsTitleHighlight: 'for off-plan investment',
   neighborhoodsAreaLabel: 'Investment Area',
   neighborhoodsListingsLabel: 'Listings',
   neighborhoodsViewAllLabel: 'Explore all neighborhoods',
@@ -668,7 +668,7 @@ const fallbackHomePage: HomePageContent = {
   blogReadMoreLabel: 'Read More',
   faqLabel: 'Complete FAQ',
   faqTitle: 'For',
-  faqTitleHighlight: 'international investors',
+  faqTitleHighlight: 'Robins clients',
   faqDescription: '',
   faqContactQuestion: '',
   faqContactHelp: '',
@@ -828,8 +828,10 @@ const mapProperties = (response: PropertyResponse, strapiBaseUrl: string): Prope
     const sourceData = asObject(entity.sourceData);
     const sourceId = optionalNumberValue(entity.sourceId) ?? optionalNumberValue(sourceData.id);
     const sourceImageUrls = collectProjectImageUrls(sourceData, sourceId);
-    const preferredGalleryUrls = galleryMediaUrls.length > 0 ? galleryMediaUrls : sourceImageUrls;
-    const galleryImages = dedupeUrls([imageLarge, ...preferredGalleryUrls].filter((url): url is string => typeof url === 'string' && url.length > 0));
+    const combinedGalleryUrls = dedupeUrls([...galleryMediaUrls, ...sourceImageUrls]);
+    const galleryImages = dedupeUrls(
+      [imageLarge, ...combinedGalleryUrls].filter((url): url is string => typeof url === 'string' && url.length > 0)
+    );
     const sourceDeveloper = asObject(sourceData.developer);
     const sourceBroker = asObject(sourceData.broker);
     const sourceGeneralPlan = asObject(sourceData.general_plan);
@@ -1005,6 +1007,7 @@ export const mapContentBundle = (bundle: {
     faqCategories: mapFaqCategories(bundle.faqCategories),
   };
 };
+
 
 
 

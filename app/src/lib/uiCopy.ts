@@ -19,11 +19,14 @@ export const uiCopy = {
     agencyEyebrow: 'Robins Properties',
     agencyTitleMain: 'Agency',
     agencyTitleAccent: 'Team',
-    agencyDescription: 'Team details sourced from robinsproperties.com/about-us with images downloaded locally for this website.',
+    agencyDescription: 'Meet the Robins Properties team supporting your Dubai off-plan investment journey.',
     groupLeadership: 'Leadership',
     groupAdvisors: 'Advisors',
     groupAdministration: 'Administration',
     groupMarketing: 'Communication & Marketing',
+    themeMode: 'Mode',
+    themeDark: 'Dark',
+    themeLight: 'White',
   },
   fr: {
     loading: 'Chargement',
@@ -43,11 +46,14 @@ export const uiCopy = {
     agencyEyebrow: 'Robins Properties',
     agencyTitleMain: 'Equipe',
     agencyTitleAccent: 'Agence',
-    agencyDescription: 'Details de l\'equipe extraits de robinsproperties.com/about-us avec images telechargees localement pour ce site.',
+    agencyDescription: 'Decouvrez l\'equipe Robins Properties qui vous accompagne sur vos investissements off-plan a Dubai.',
     groupLeadership: 'Direction',
     groupAdvisors: 'Conseillers',
     groupAdministration: 'Administration',
     groupMarketing: 'Communication & Marketing',
+    themeMode: 'Mode',
+    themeDark: 'Sombre',
+    themeLight: 'Blanc',
   },
   ar: {
     loading: '\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u062d\u0645\u064a\u0644',
@@ -67,11 +73,14 @@ export const uiCopy = {
     agencyEyebrow: '\u0631\u0648\u0628\u0646\u0632 \u0628\u0631\u0648\u0628\u0631\u062a\u064a\u0632',
     agencyTitleMain: '\u0641\u0631\u064a\u0642',
     agencyTitleAccent: '\u0627\u0644\u0648\u0643\u0627\u0644\u0629',
-    agencyDescription: '\u062a\u0645 \u062c\u0644\u0628 \u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0641\u0631\u064a\u0642 \u0645\u0646 robinsproperties.com/about-us \u0645\u0639 \u062a\u0646\u0632\u064a\u0644 \u0627\u0644\u0635\u0648\u0631 \u0645\u062d\u0644\u064a\u0627\u064b \u0644\u0647\u0630\u0627 \u0627\u0644\u0645\u0648\u0642\u0639.',
+    agencyDescription: '\u062a\u0639\u0631\u0641 \u0639\u0644\u0649 \u0641\u0631\u064a\u0642 Robins Properties \u0627\u0644\u0630\u064a \u064a\u0633\u0627\u0639\u062f\u0643 \u0641\u064a \u0627\u0633\u062a\u062b\u0645\u0627\u0631\u0627\u062a \u0627\u0644\u0639\u0642\u0627\u0631\u0627\u062a \u0642\u064a\u062f \u0627\u0644\u0625\u0646\u0634\u0627\u0621 \u0641\u064a \u062f\u0628\u064a.',
     groupLeadership: '\u0627\u0644\u0625\u062f\u0627\u0631\u0629',
     groupAdvisors: '\u0627\u0644\u0645\u0633\u062a\u0634\u0627\u0631\u0648\u0646',
     groupAdministration: '\u0627\u0644\u0625\u062f\u0627\u0631\u0629',
     groupMarketing: '\u0627\u0644\u062a\u0633\u0648\u064a\u0642 \u0648\u0627\u0644\u062a\u0648\u0627\u0635\u0644',
+    themeMode: '\u0627\u0644\u0646\u0645\u0637',
+    themeDark: '\u062f\u0627\u0643\u0646',
+    themeLight: '\u0623\u0628\u064a\u0636',
   },
 } satisfies Record<Locale, {
   loading: string;
@@ -96,4 +105,8 @@ export const uiCopy = {
   groupAdvisors: string;
   groupAdministration: string;
   groupMarketing: string;
+  themeMode: string;
+  themeDark: string;
+  themeLight: string;
 }>;
+

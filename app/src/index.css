@@ -284,6 +284,11 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .defer-render {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 960px;
+  }
   
   .animation-delay-100 {
     animation-delay: 100ms;
@@ -364,3 +369,81 @@ html[dir='rtl'] select {
 
 
 
+
+html[data-theme='light'] {
+  color-scheme: light;
+}
+
+html[data-theme='light'] body {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+html[data-theme='light'] ::-webkit-scrollbar-track {
+  background: #e6eaf0;
+}
+
+html[data-theme='light'] ::-webkit-scrollbar-thumb {
+  background: #b8c0cc;
+}
+
+html[data-theme='light'] ::selection {
+  background: rgba(212, 168, 83, 0.25);
+  color: #111827;
+}
+
+html[data-theme='light'] .loading-screen {
+  background: #f3f4f6 !important;
+}
+
+html[data-theme='light'] .glass-card {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(212, 168, 83, 0.28);
+}
+
+html[data-theme='light'] [class*='bg-[#0a0a0a]'] {
+  background-color: #f3f4f6 !important;
+}
+
+html[data-theme='light'] [class*='bg-[#1a1a1a]'],
+html[data-theme='light'] [class*='bg-[#121212]'] {
+  background-color: #ffffff !important;
+}
+
+html[data-theme='light'] [class*='bg-[#2d2d2d]'] {
+  background-color: #eef2f7 !important;
+}
+
+html[data-theme='light'] [class*='border-[#333333]'],
+html[data-theme='light'] [class*='border-[#2a2a2a]'],
+html[data-theme='light'] [class*='border-[#555555]'] {
+  border-color: #d9dce3 !important;
+}
+
+html[data-theme='light'] [class*='text-white'] {
+  color: #111827 !important;
+}
+
+html[data-theme='light'] [class*='text-[#888888]'],
+html[data-theme='light'] [class*='text-[#9a9a9a]'],
+html[data-theme='light'] [class*='text-white/70'],
+html[data-theme='light'] [class*='text-white/80'],
+html[data-theme='light'] [class*='text-white/90'] {
+  color: #4b5563 !important;
+}
+
+html[data-theme='light'] [class*='bg-gradient-to-t'][class*='from-[#0a0a0a]'] {
+  background-image: linear-gradient(to top, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.1)) !important;
+}
+
+html[data-theme='light'] [class*='bg-gradient-to-r'][class*='from-[#0a0a0a]'] {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.15), transparent) !important;
+}
+
+html[data-theme='light'] [class*='hover:bg-[#2d2d2d]']:hover {
+  background-color: #eef2f7 !important;
+}
+
+html[data-theme='light'] [class*='hover:border-[#555555]']:hover {
+  border-color: #bcc3cf !important;
+}

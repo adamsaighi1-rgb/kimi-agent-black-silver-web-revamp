@@ -7,6 +7,7 @@ import LoadingScreen from './components/LoadingScreen';
 import SeoController from './components/SeoController';
 import { useCurrency } from './context/CurrencyContext';
 import { useLocale } from './context/LocaleContext';
+import { useTheme } from './context/ThemeContext';
 import { filterProperties, type PropertyFilterCriteria } from './lib/propertyFilters';
 import { APP_ROUTES } from './lib/siteRoutes';
 import { uiCopy } from './lib/uiCopy';
@@ -135,6 +136,7 @@ const PageRoutes = ({
 function App() {
   const { locale, setLocale } = useLocale();
   const { currency, setCurrency } = useCurrency();
+  const { theme, setTheme } = useTheme();
   const copy = uiCopy[locale];
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
@@ -340,8 +342,10 @@ function App() {
               config={content.siteConfig}
               locale={locale}
               currency={currency}
+              theme={theme}
               onLocaleChange={setLocale}
               onCurrencyChange={setCurrency}
+              onThemeChange={setTheme}
             />
             <main>
               <PageRoutes

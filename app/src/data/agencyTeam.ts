@@ -37,12 +37,6 @@ export const agencyTeamMembers: TeamMember[] = [
     group: 'Advisors',
   },
   {
-    name: 'Mathias',
-    role: { en: 'Investment Advisor', fr: 'Conseiller en investissement', ar: 'مستشار استثمار' },
-    image: '/team/mathias.png',
-    group: 'Advisors',
-  },
-  {
     name: 'Sofiane AMERI',
     role: { en: 'Investment Advisor', fr: 'Conseiller en investissement', ar: 'مستشار استثمار' },
     image: '/team/sofiane-ameri.png',

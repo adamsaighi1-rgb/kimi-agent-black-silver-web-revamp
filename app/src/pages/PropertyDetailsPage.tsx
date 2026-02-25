@@ -309,25 +309,6 @@ const humanizeValue = (value: string | undefined) => {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 };
 
-const formatBedroomLabel = (
-  rawValue: string,
-  studioLabel: string,
-  shortLabel: string
-) => {
-  const normalized = rawValue.trim().toLowerCase();
-
-  if (!normalized) return rawValue;
-
-  if (normalized === '0' || normalized.includes('studio') || normalized.includes('\u0627\u0633\u062a\u0648\u062f\u064a\u0648')) {
-    return studioLabel;
-  }
-
-  const numberMatch = normalized.match(/\d+/);
-  if (!numberMatch) return rawValue;
-
-  return `${numberMatch[0]} ${shortLabel}`;
-};
-
 
 const PropertyDetailsPage = ({ properties, config }: PropertyDetailsPageProps) => {
   const { propertyId } = useParams();
@@ -613,8 +594,6 @@ const PropertyDetailsPage = ({ properties, config }: PropertyDetailsPageProps) =
     { label: t.resale, value: reellyDetails?.resaleConditions },
     { label: t.managingCompany, value: reellyDetails?.managingCompany },
   ].filter((row) => row.value && row.value.trim().length > 0);
-
-  const inventoryRows = reellyDetails?.inventories ?? [];
   const brochureFiles = reellyDetails?.brochures ?? [];
   const paymentPlans = reellyDetails?.paymentPlans ?? [];
   const unitRows = reellyDetails?.units ?? [];
@@ -641,7 +620,7 @@ const PropertyDetailsPage = ({ properties, config }: PropertyDetailsPageProps) =
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         <div className="rounded-2xl overflow-hidden border border-[#333333] bg-[#121212]">
-          <img src={activeImage || primaryImage} alt={property.title} className="w-full h-[420px] object-cover" decoding="async" fetchPriority="high" />
+          <img src={activeImage || primaryImage} alt={property.title} className="w-full h-[420px] object-cover" loading="eager" decoding="async" fetchPriority="high" />
 
           {galleryImages.length > 1 ? (
             <div className="p-4 border-t border-[#2a2a2a] bg-[#0f0f0f]">
@@ -819,38 +798,7 @@ const PropertyDetailsPage = ({ properties, config }: PropertyDetailsPageProps) =
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="rounded-2xl border border-[#333333] bg-[#121212] p-6 md:p-8">
-          <h2 className="text-2xl font-bold text-white mb-4">{t.inventoryMix}</h2>
-
-          {inventoryRows.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[420px] text-sm">
-                <thead>
-                  <tr className="text-left border-b border-[#333333] text-[#8f8f8f]">
-                    <th className="py-2 pr-4 font-medium">{t.bedroomMix}</th>
-                    <th className="py-2 pr-4 font-medium">{t.fromSize}</th>
-                    <th className="py-2 font-medium">{t.totalUnits}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inventoryRows.map((row, index) => (
-                    <tr key={`${row.bedrooms}-${index}`} className="border-b border-[#242424] text-[#d5d5d5]">
-                      <td className="py-2 pr-4">{formatBedroomLabel(row.bedrooms, t.studio, t.bedroomShort)}</td>
-                      <td className="py-2 pr-4">
-                        {formatNumber(row.fromSizeSqFt, locale) ? `${formatNumber(row.fromSizeSqFt, locale)} ${t.areaUnitSqFt}` : t.unknown}
-                      </td>
-                      <td className="py-2">{formatNumber(row.totalUnits, locale) || t.unknown}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-[#888888]">{t.reellyNotAvailable}</p>
-          )}
-        </div>
-
+      <div className="mt-8 defer-render">
         <div className="rounded-2xl border border-[#333333] bg-[#121212] p-6 md:p-8">
           <h2 className="text-2xl font-bold text-white mb-4">{t.masterPlan}</h2>
 
@@ -949,7 +897,7 @@ const PropertyDetailsPage = ({ properties, config }: PropertyDetailsPageProps) =
         </div>
       </div>
 
-      <div className="mt-8 rounded-2xl border border-[#333333] bg-[#121212] p-6 md:p-8">
+      <div className="mt-8 rounded-2xl border border-[#333333] bg-[#121212] p-6 md:p-8 defer-render">
         <h2 className="text-2xl font-bold text-white mb-4">{t.paymentPlans}</h2>
         {paymentPlans.length > 0 ? (
           <div className="space-y-4">
@@ -986,7 +934,7 @@ const PropertyDetailsPage = ({ properties, config }: PropertyDetailsPageProps) =
         )}
       </div>
 
-      <div className="mt-8 rounded-2xl border border-[#333333] bg-[#121212] p-6 md:p-8">
+      <div className="mt-8 rounded-2xl border border-[#333333] bg-[#121212] p-6 md:p-8 defer-render">
         <h2 className="text-2xl font-bold text-white mb-4">{t.units}</h2>
         {unitRows.length > 0 ? (
           <div className="overflow-x-auto">
@@ -1048,7 +996,7 @@ const PropertyDetailsPage = ({ properties, config }: PropertyDetailsPageProps) =
         )}
       </div>
 
-      <div className="mt-8 rounded-2xl border border-[#333333] bg-[#121212] p-6 md:p-8">
+      <div className="mt-8 rounded-2xl border border-[#333333] bg-[#121212] p-6 md:p-8 defer-render">
         <h2 className="text-2xl font-bold text-white mb-4">{t.mapSection}</h2>
         {mapEmbedSrc ? (
           <div className="w-full overflow-hidden rounded-xl border border-[#2d2d2d]">
