@@ -145,7 +145,7 @@ const FeaturedProperties = ({ content, properties }: FeaturedPropertiesProps) =>
                 onClick={() => setCurrentIndex(index)}
               >
                 <div className="bg-[#1a1a1a] rounded-2xl overflow-hidden shadow-2xl">
-                  <div className="relative h-64 md:h-80 overflow-hidden">
+                  <div className="readable-image-card relative h-64 md:h-80 overflow-hidden">
                     <img
                       src={property.image}
                       alt={property.title}
@@ -154,7 +154,7 @@ const FeaturedProperties = ({ content, properties }: FeaturedPropertiesProps) =>
                       decoding="async"
                       fetchPriority={index === currentIndex ? 'high' : 'low'}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+                    <div className="image-card-overlay absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
 
                     {property.featured && (
                       <span className="absolute top-4 left-4 px-3 py-1 bg-[#d4a853] text-[#0a0a0a] text-xs font-bold rounded-full">
@@ -163,7 +163,7 @@ const FeaturedProperties = ({ content, properties }: FeaturedPropertiesProps) =>
                     )}
 
                     <div className="absolute bottom-4 left-4">
-                      <p className="text-3xl font-bold text-white">{formattedPrice}</p>
+                      <p className="image-card-title text-3xl font-bold text-white">{formattedPrice}</p>
                     </div>
                   </div>
 

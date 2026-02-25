@@ -42,10 +42,10 @@ const NeighborhoodCard = ({
         transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
-      <div className="relative h-full min-h-[250px] md:min-h-[300px] overflow-hidden rounded-2xl" style={{ transform: 'rotate(0deg)' }}>
+      <div className="readable-image-card relative h-full min-h-[250px] md:min-h-[300px] overflow-hidden rounded-2xl" style={{ transform: 'rotate(0deg)' }}>
         <img src={neighborhood.image} alt={neighborhood.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" decoding="async" />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent opacity-70 group-hover:opacity-80 transition-opacity duration-300" />
+        <div className="image-card-overlay absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent opacity-70 group-hover:opacity-80 transition-opacity duration-300" />
 
         <div className="absolute inset-0 p-6 flex flex-col justify-end">
           <div className="flex items-center gap-2 text-[#d4a853] mb-2">
@@ -53,10 +53,10 @@ const NeighborhoodCard = ({
             <span className="text-xs tracking-wider uppercase">{areaLabel}</span>
           </div>
 
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 group-hover:text-[#d4a853] transition-colors duration-300">{neighborhood.name}</h3>
+          <h3 className="image-card-title text-2xl md:text-3xl font-bold text-white mb-2 group-hover:text-[#d4a853] transition-colors duration-300">{neighborhood.name}</h3>
 
           <div className="flex items-center justify-between">
-            <span className="text-[#888888] text-sm">
+            <span className="image-card-subtitle text-[#888888] text-sm">
               {neighborhood.listings} {listingsLabel}
             </span>
 

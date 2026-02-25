@@ -483,3 +483,29 @@ html[data-theme='light'] .image-banner .featured-agent-title {
   color: #f8fafc !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
+
+
+html[data-theme='light'] .readable-image-card .image-card-overlay {
+  background-image: linear-gradient(
+    to top,
+    rgba(10, 10, 10, 0.76) 0%,
+    rgba(10, 10, 10, 0.42) 45%,
+    rgba(10, 10, 10, 0.1) 72%,
+    transparent 100%
+  ) !important;
+  opacity: 1 !important;
+}
+
+html[data-theme='light'] .readable-image-card .image-card-title {
+  color: #f8fafc !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme='light'] .readable-image-card .image-card-subtitle {
+  color: rgba(226, 232, 240, 0.92) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme='light'] .group:hover .image-card-title {
+  color: #d4a853 !important;
+}
