@@ -88,7 +88,7 @@ const Hero = ({ content }: { content: HomePageContent }) => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative h-screen w-full overflow-hidden">
+    <section ref={sectionRef} className="image-banner relative h-screen w-full overflow-hidden">
       <div
         ref={bgRef}
         className="absolute inset-0 w-full h-full"

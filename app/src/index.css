@@ -451,3 +451,24 @@ html[data-theme='light'] [class*='hover:bg-[#2d2d2d]']:hover {
 html[data-theme='light'] [class*='hover:border-[#555555]']:hover {
   border-color: #98a6b8 !important;
 }
+
+
+html[data-theme='light'] .image-banner [class*='text-white'] {
+  color: #f8fafc !important;
+}
+
+html[data-theme='light'] .image-banner [class*='text-[#888888]'],
+html[data-theme='light'] .image-banner [class*='text-[#9a9a9a]'],
+html[data-theme='light'] .image-banner [class*='text-white/70'],
+html[data-theme='light'] .image-banner [class*='text-white/80'],
+html[data-theme='light'] .image-banner [class*='text-white/90'] {
+  color: rgba(226, 232, 240, 0.9) !important;
+}
+
+html[data-theme='light'] .image-banner .featured-overlay-x {
+  background-image: linear-gradient(to right, rgba(10, 10, 10, 0.82), rgba(10, 10, 10, 0.45), transparent) !important;
+}
+
+html[data-theme='light'] .image-banner .featured-overlay-y {
+  background-image: linear-gradient(to top, rgba(10, 10, 10, 0.72), transparent, rgba(10, 10, 10, 0.28)) !important;
+}

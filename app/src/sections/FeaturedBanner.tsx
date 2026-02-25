@@ -46,7 +46,7 @@ const FeaturedBanner = ({ content }: { content: HomePageContent }) => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative h-[70vh] min-h-[500px] overflow-hidden">
+    <section ref={sectionRef} className="image-banner relative h-[70vh] min-h-[500px] overflow-hidden">
       <div
         ref={bgRef}
         className="absolute inset-0 w-full h-[150%] -top-[25%]"
@@ -58,8 +58,8 @@ const FeaturedBanner = ({ content }: { content: HomePageContent }) => {
         }}
       />
 
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/90 via-[#0a0a0a]/50 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/30" />
+      <div className="featured-overlay-x absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/90 via-[#0a0a0a]/50 to-transparent" />
+      <div className="featured-overlay-y absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]/30" />
 
       <div ref={contentRef} className="relative z-10 h-full flex items-center section-padding">
         <div className="max-w-2xl">
