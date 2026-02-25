@@ -1,4 +1,4 @@
-export type LocaleCode = 'en' | 'fr' | 'ar';
+﻿export type LocaleCode = 'en' | 'fr' | 'ar';
 
 type Localized<T> = Record<LocaleCode, T>;
 
@@ -221,7 +221,7 @@ const baseProperties: PropertySeed[] = [
     showInFooter: true,
     order: 10,
     image: 'property-5.jpg',
-    agent: { name: 'Maria Barlow', title: 'Senior Consultant' },
+    agent: { name: 'Hakim ESSAAIDI', title: 'Senior Consultant' },
   },
   {
     seedKey: 'penthouse-360-infinity-pool',
@@ -354,7 +354,7 @@ const baseHomePage: HomePageSeed = {
   featuredBannerDescription: 'Discover this exceptional penthouse with private pool and skyline views.',
   featuredBannerCtaLabel: 'Discover More',
   featuredBannerImage: 'featured-property.jpg',
-  featuredBannerAgent: { name: 'Maria Barlow', title: 'Senior Consultant' },
+  featuredBannerAgent: { name: 'Hakim ESSAAIDI', title: 'Senior Consultant' },
   featuredBannerStats: [
     { value: '4', label: 'Bedrooms' },
     { value: '3', label: 'Bathrooms' },
@@ -603,7 +603,7 @@ export const homePageSeed: Localized<HomePageSeed> = {
     featuredBannerTitleHighlight: 'avec piscine privee',
     featuredBannerDescription: 'Decouvrez ce penthouse exceptionnel avec piscine privee et vue sur skyline.',
     featuredBannerCtaLabel: 'En savoir plus',
-    featuredBannerAgent: { name: 'Maria Barlow', title: 'Consultante senior' },
+    featuredBannerAgent: { name: 'Hakim ESSAAIDI', title: 'Consultante senior' },
     featuredBannerStats: [
       { value: '4', label: 'Chambres' },
       { value: '3', label: 'Salles de bain' },
@@ -677,7 +677,7 @@ export const homePageSeed: Localized<HomePageSeed> = {
     featuredBannerTitleHighlight: '\u0648\u0625\u0637\u0644\u0627\u0644\u0629 \u062e\u0644\u0627\u0628\u0629',
     featuredBannerDescription: '\u0627\u0643\u062a\u0634\u0641 \u0647\u0630\u0627 \u0627\u0644\u0628\u0646\u062a\u0647\u0627\u0648\u0633 \u0627\u0644\u0627\u0633\u062a\u062b\u0646\u0627\u0626\u064a \u0645\u0639 \u0645\u0633\u0628\u062d \u062e\u0627\u0635 \u0648\u0645\u0634\u0647\u062f \u0628\u0627\u0646\u0648\u0631\u0627\u0645\u064a.',
     featuredBannerCtaLabel: '\u0627\u0643\u062a\u0634\u0641 \u0627\u0644\u0645\u0632\u064a\u062f',
-    featuredBannerAgent: { name: 'Maria Barlow', title: '\u0645\u0633\u062a\u0634\u0627\u0631\u0629 \u0623\u0648\u0644\u0649' },
+    featuredBannerAgent: { name: 'Hakim ESSAAIDI', title: '\u0645\u0633\u062a\u0634\u0627\u0631\u0629 \u0623\u0648\u0644\u0649' },
     featuredBannerStats: [
       { value: '4', label: '\u063a\u0631\u0641 \u0646\u0648\u0645' },
       { value: '3', label: '\u062d\u0645\u0627\u0645\u0627\u062a' },
@@ -843,5 +843,6 @@ export const seedAssetFiles = [
   'neighborhood-islands.jpg',
   'neighborhood-siniya.jpg',
 ];
+
 
 

@@ -91,6 +91,14 @@ const optionalTextValue = (value: unknown): string | undefined => {
   return trimmed.length > 0 ? trimmed : undefined;
 };
 
+const normalizePersonName = (value: string) => {
+  if (/^maria\s+barlow$/i.test(value.trim())) {
+    return 'Hakim ESSAAIDI';
+  }
+
+  return value;
+};
+
 const mapWorkingHours = (value: unknown) => {
   const items = unwrapArray(value)
     .map((item) => {
@@ -768,7 +776,7 @@ const mapHomePage = (response: HomePageResponse, strapiBaseUrl: string): HomePag
     featuredBannerCtaLabel: stringValue(entity.featuredBannerCtaLabel, fallbackHomePage.featuredBannerCtaLabel),
     featuredBannerImage: mediaUrl(entity.featuredBannerImage, strapiBaseUrl, fallbackHomePage.featuredBannerImage, ['large', 'medium']),
     featuredBannerAgent: {
-      name: stringValue(unwrapEntity(entity.featuredBannerAgent).name, fallbackHomePage.featuredBannerAgent.name),
+      name: normalizePersonName(stringValue(unwrapEntity(entity.featuredBannerAgent).name, fallbackHomePage.featuredBannerAgent.name)),
       title: stringValue(unwrapEntity(entity.featuredBannerAgent).title, fallbackHomePage.featuredBannerAgent.title),
     },
     featuredBannerStats: normalizeStats(entity.featuredBannerStats),
@@ -802,7 +810,7 @@ const mapProperties = (response: PropertyResponse, strapiBaseUrl: string): Prope
   const mappedProperties = response.data.map((item) => {
     const entity = unwrapEntity(item);
     const rawAgent = unwrapEntity(entity.agent);
-    const agentName = stringValue(rawAgent.name);
+    const agentName = normalizePersonName(stringValue(rawAgent.name));
     const agentTitle = stringValue(rawAgent.title);
 
     const amenityDetails = unwrapArray(entity.amenityDetails)
