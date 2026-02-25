@@ -59,44 +59,32 @@ const Header = ({ config, locale, currency, theme, onLocaleChange, onCurrencyCha
     { value: 'light', label: copy.themeLight },
   ];
 
-  const headerThemeClass = isScrolled
-    ? theme === 'light'
+  const headerThemeClass =
+    theme === 'light'
       ? 'bg-white/95 backdrop-blur-xl border-b border-[#d9dce3]'
-      : 'bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-[#333333]/50'
-    : 'bg-transparent';
+      : isScrolled
+        ? 'bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-[#333333]/50'
+        : 'bg-transparent';
 
-  const isLightTransparentHeader = theme === 'light' && !isScrolled;
   const navInactiveClass =
-    theme === 'light'
-      ? isLightTransparentHeader
-        ? 'text-[#f8fafc] hover:text-[#d4a853]'
-        : 'text-[#374151] hover:text-[#d4a853]'
-      : 'text-white/80 hover:text-[#d4a853]';
-  const controlTextClass =
-    theme === 'light'
-      ? isLightTransparentHeader
-        ? 'text-[#e2e8f0]'
-        : 'text-[#374151]'
-      : 'text-white/80';
+    theme === 'light' ? 'text-[#374151] hover:text-[#d4a853]' : 'text-white/80 hover:text-[#d4a853]';
+
+  const controlTextClass = theme === 'light' ? 'text-[#374151]' : 'text-white/80';
+
   const selectClass =
     theme === 'light'
-      ? isLightTransparentHeader
-        ? 'bg-[#111827]/70 border border-[#475569] text-[#f8fafc] text-xs px-2 py-1 rounded-sm focus:outline-none focus:border-[#d4a853]'
-        : 'bg-white border border-[#d9dce3] text-[#111827] text-xs px-2 py-1 rounded-sm focus:outline-none focus:border-[#d4a853]'
+      ? 'bg-white border border-[#d9dce3] text-[#111827] text-xs px-2 py-1 rounded-sm focus:outline-none focus:border-[#d4a853]'
       : 'bg-[#1a1a1a] border border-[#333333] text-white text-xs px-2 py-1 rounded-sm focus:outline-none focus:border-[#d4a853]';
-  const brandMainClass = theme === 'light' ? (isScrolled ? 'text-[#111827]' : 'text-[#f8fafc]') : 'text-white';
+
+  const brandMainClass = theme === 'light' ? 'text-[#111827]' : 'text-white';
+
   const brandSubClass =
     theme === 'light'
-      ? isScrolled
-        ? 'text-[#6b7280] text-xs tracking-[0.2em] uppercase hidden sm:block'
-        : 'text-[#cbd5e1] text-xs tracking-[0.2em] uppercase hidden sm:block'
+      ? 'text-[#6b7280] text-xs tracking-[0.2em] uppercase hidden sm:block'
       : 'text-[#888888] text-xs tracking-[0.2em] uppercase hidden sm:block';
+
   const mobileToggleClass =
-    theme === 'light'
-      ? isLightTransparentHeader
-        ? 'text-[#f8fafc] hover:text-[#d4a853]'
-        : 'text-[#111827] hover:text-[#d4a853]'
-      : 'text-white hover:text-[#d4a853]';
+    theme === 'light' ? 'text-[#111827] hover:text-[#d4a853]' : 'text-white hover:text-[#d4a853]';
 
   return (
     <header
@@ -344,3 +332,4 @@ const Header = ({ config, locale, currency, theme, onLocaleChange, onCurrencyCha
 };
 
 export default Header;
+
