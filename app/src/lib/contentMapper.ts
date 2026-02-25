@@ -473,15 +473,42 @@ const isLikelyProjectImageUrl = (url: string, sourceId: number | null) => {
   return normalized.includes(`/projects/${sourceId}/`);
 };
 
+const urlExt = (url: string) => {
+  try {
+    const parsed = new URL(url);
+    return parsed.pathname.split('.').pop()?.toLowerCase() ?? '';
+  } catch {
+    return url.split('?')[0]?.split('#')[0]?.split('.').pop()?.toLowerCase() ?? '';
+  }
+};
+
+const isLikelyImageUrl = (url: string) => {
+  const ext = urlExt(url);
+  return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'bmp', 'svg'].includes(ext);
+};
+
+const isExcludedImageUrl = (url: string) => {
+  const normalized = url.toLowerCase();
+  return normalized.includes('/amenity_icons/');
+};
+
 const collectProjectImageUrls = (value: unknown, sourceId: number | null) => {
   const urlsByKey = new Map<string, string>();
 
-  const addUrl = (input: unknown) => {
+  const addUrl = (input: unknown, strictProjectMatch = false) => {
     if (typeof input !== 'string' || input.length === 0) {
       return;
     }
 
-    if (!isLikelyProjectImageUrl(input, sourceId)) {
+    if (isExcludedImageUrl(input)) {
+      return;
+    }
+
+    if (!isLikelyImageUrl(input)) {
+      return;
+    }
+
+    if (strictProjectMatch && !isLikelyProjectImageUrl(input, sourceId)) {
       return;
     }
 
@@ -496,7 +523,15 @@ const collectProjectImageUrls = (value: unknown, sourceId: number | null) => {
   const mediaObject = asObject(source.reellyMedia ?? source.media);
 
   unwrapArray(mediaObject.images).forEach((entry) => {
-    addUrl(asObject(entry).url);
+    const imageObject = asObject(entry);
+    addUrl(imageObject.url);
+    addUrl(imageObject.file);
+  });
+
+  unwrapArray(mediaObject.files).forEach((entry) => {
+    const fileObject = asObject(entry);
+    addUrl(fileObject.url);
+    addUrl(fileObject.file);
   });
 
   const unitsValue = source.reellyUnits ?? source.units ?? source.units_details ?? source.units_catalog;
@@ -505,7 +540,9 @@ const collectProjectImageUrls = (value: unknown, sourceId: number | null) => {
     const layout = asObject(asObject(unitEntry).layout);
 
     unwrapArray(layout.images).forEach((layoutEntry) => {
-      addUrl(asObject(asObject(layoutEntry).image).url);
+      const imageWrapper = asObject(asObject(layoutEntry).image);
+      addUrl(imageWrapper.url);
+      addUrl(imageWrapper.file);
     });
   });
 
@@ -519,8 +556,8 @@ const collectProjectImageUrls = (value: unknown, sourceId: number | null) => {
       const objectNode = asObject(node);
 
       Object.entries(objectNode).forEach(([key, child]) => {
-        if (key === 'url' && typeof child === 'string') {
-          addUrl(child);
+        if ((key === 'url' || key === 'file') && typeof child === 'string') {
+          addUrl(child, true);
           return;
         }
 
@@ -844,7 +881,12 @@ const mapProperties = (
     const sourceData = asObject(entity.sourceData);
     const sourceId = optionalNumberValue(entity.sourceId) ?? optionalNumberValue(sourceData.id);
     const sourceImageUrls = collectProjectImageUrls(sourceData, sourceId);
-    const combinedGalleryUrls = dedupeUrls([...galleryMediaUrls, ...sourceImageUrls]);
+    const sourceCoverUrl = optionalTextValue(asObject(sourceData.cover_image).url);
+    const filteredSourceImageUrls = sourceCoverUrl
+      ? sourceImageUrls.filter((url) => normalizeUrlKey(url) !== normalizeUrlKey(sourceCoverUrl))
+      : sourceImageUrls;
+    const combinedGalleryUrls =
+      galleryMediaUrls.length > 1 ? galleryMediaUrls : dedupeUrls([...galleryMediaUrls, ...filteredSourceImageUrls]);
     const galleryImages = dedupeUrls(
       [imageLarge, ...combinedGalleryUrls].filter((url): url is string => typeof url === 'string' && url.length > 0)
     );
@@ -1027,33 +1069,4 @@ export const mapContentBundle = (bundle: {
     faqCategories: mapFaqCategories(bundle.faqCategories),
   };
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

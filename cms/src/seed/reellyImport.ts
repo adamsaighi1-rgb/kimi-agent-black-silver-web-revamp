@@ -268,6 +268,26 @@ const isReellyProjectImageUrl = (url: string, projectId: number) => {
   return normalized.includes(`/projects/${projectId}/`);
 };
 
+const rawUrlExt = (url: string) => {
+  try {
+    const parsed = new URL(url);
+    return path.extname(parsed.pathname).toLowerCase().replace('.', '');
+  } catch {
+    const clean = url.split('?')[0]?.split('#')[0] ?? '';
+    const ext = path.extname(clean).toLowerCase();
+    return ext.replace('.', '');
+  }
+};
+
+const isLikelyImageUrl = (url: string) => {
+  const ext = rawUrlExt(url);
+  return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'bmp', 'svg'].includes(ext);
+};
+
+const isExcludedImageUrl = (url: string) => {
+  return url.toLowerCase().includes('/amenity_icons/');
+};
+
 const normalizeUrlKey = (url: string) => {
   try {
     const parsed = new URL(url);
@@ -280,9 +300,11 @@ const normalizeUrlKey = (url: string) => {
 const collectProjectImageUrls = (project: ReellyProjectDetail) => {
   const urlsByKey = new Map<string, string>();
 
-  const addUrl = (value: unknown) => {
+  const addUrl = (value: unknown, strictProjectMatch = false) => {
     if (typeof value !== 'string' || value.length === 0) return;
-    if (!isReellyProjectImageUrl(value, project.id)) return;
+    if (isExcludedImageUrl(value)) return;
+    if (!isLikelyImageUrl(value)) return;
+    if (strictProjectMatch && !isReellyProjectImageUrl(value, project.id)) return;
 
     const key = normalizeUrlKey(value);
     if (!urlsByKey.has(key)) {
@@ -300,7 +322,20 @@ const collectProjectImageUrls = (project: ReellyProjectDetail) => {
 
     for (const mediaImage of mediaImages) {
       if (!mediaImage || typeof mediaImage !== 'object') continue;
-      addUrl((mediaImage as Record<string, unknown>).url);
+      const imageObject = mediaImage as Record<string, unknown>;
+      addUrl(imageObject.url);
+      addUrl(imageObject.file);
+    }
+
+    const mediaFiles = Array.isArray((mediaObject as Record<string, unknown>).files)
+      ? ((mediaObject as Record<string, unknown>).files as unknown[])
+      : [];
+
+    for (const mediaFile of mediaFiles) {
+      if (!mediaFile || typeof mediaFile !== 'object') continue;
+      const fileObject = mediaFile as Record<string, unknown>;
+      addUrl(fileObject.url);
+      addUrl(fileObject.file);
     }
   }
 
@@ -321,7 +356,32 @@ const collectProjectImageUrls = (project: ReellyProjectDetail) => {
       const image = (layoutImage as Record<string, unknown>).image;
       if (!image || typeof image !== 'object') continue;
       addUrl((image as Record<string, unknown>).url);
+      addUrl((image as Record<string, unknown>).file);
     }
+  }
+
+  if (urlsByKey.size === 0) {
+    const walk = (value: unknown) => {
+      if (Array.isArray(value)) {
+        value.forEach(walk);
+        return;
+      }
+
+      if (!value || typeof value !== 'object') return;
+
+      for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+        if ((key === 'url' || key === 'file') && typeof child === 'string') {
+          addUrl(child, true);
+          continue;
+        }
+
+        if (child && typeof child === 'object') {
+          walk(child);
+        }
+      }
+    };
+
+    walk(project);
   }
 
   if (urlsByKey.size === 0) {
@@ -901,7 +961,8 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
       continue;
     }
 
-    const projectImageUrls = collectProjectImageUrls(project).filter((url) => url !== coverUrl);
+    const coverUrlKey = coverUrl ? normalizeUrlKey(coverUrl) : '';
+    const projectImageUrls = collectProjectImageUrls(project).filter((url) => normalizeUrlKey(url) !== coverUrlKey);
     const galleryMediaIds: number[] = [];
     const galleryLocalPaths: string[] = [];
 
@@ -1083,19 +1144,4 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
     `Reelly import completed. Imported ${importedProperties.length} projects and ${neighborhoodPayloads.length} neighborhoods.`
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
