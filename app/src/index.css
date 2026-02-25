@@ -375,12 +375,12 @@ html[data-theme='light'] {
 }
 
 html[data-theme='light'] body {
-  background: #e9edf2;
+  background: #d8dee6;
   color: #111827;
 }
 
 html[data-theme='light'] ::-webkit-scrollbar-track {
-  background: #dde3ea;
+  background: #ccd4df;
 }
 
 html[data-theme='light'] ::-webkit-scrollbar-thumb {
@@ -393,35 +393,39 @@ html[data-theme='light'] ::selection {
 }
 
 html[data-theme='light'] .loading-screen {
-  background: #e9edf2 !important;
+  background: #d8dee6 !important;
 }
 
 html[data-theme='light'] .glass-card {
-  background: rgba(246, 248, 251, 0.94);
+  background: rgba(223, 230, 239, 0.92);
   border-color: rgba(212, 168, 83, 0.28);
 }
 
 html[data-theme='light'] [class*='bg-[#0a0a0a]'] {
-  background-color: #e9edf2 !important;
+  background-color: #d8dee6 !important;
 }
 
 html[data-theme='light'] [class*='bg-[#1a1a1a]'],
 html[data-theme='light'] [class*='bg-[#121212]'] {
-  background-color: #f5f7fa !important;
+  background-color: #e1e7ef !important;
 }
 
 html[data-theme='light'] [class*='bg-[#2d2d2d]'] {
-  background-color: #e6ebf2 !important;
+  background-color: #d4dce7 !important;
+}
+
+html[data-theme='light'] [class*='bg-white'] {
+  background-color: #e1e7ef !important;
 }
 
 html[data-theme='light'] [class*='border-[#333333]'],
 html[data-theme='light'] [class*='border-[#2a2a2a]'],
 html[data-theme='light'] [class*='border-[#555555]'] {
-  border-color: #cfd6df !important;
+  border-color: #bcc6d3 !important;
 }
 
 html[data-theme='light'] [class*='text-white'] {
-  color: #1f2937 !important;
+  color: #172133 !important;
 }
 
 html[data-theme='light'] [class*='text-[#888888]'],
@@ -429,7 +433,7 @@ html[data-theme='light'] [class*='text-[#9a9a9a]'],
 html[data-theme='light'] [class*='text-white/70'],
 html[data-theme='light'] [class*='text-white/80'],
 html[data-theme='light'] [class*='text-white/90'] {
-  color: #5b6675 !important;
+  color: #4f5a6b !important;
 }
 
 html[data-theme='light'] [class*='bg-gradient-to-t'][class*='from-[#0a0a0a]'] {
@@ -441,9 +445,9 @@ html[data-theme='light'] [class*='bg-gradient-to-r'][class*='from-[#0a0a0a]'] {
 }
 
 html[data-theme='light'] [class*='hover:bg-[#2d2d2d]']:hover {
-  background-color: #eef2f7 !important;
+  background-color: #cfd8e4 !important;
 }
 
 html[data-theme='light'] [class*='hover:border-[#555555]']:hover {
-  border-color: #aeb8c6 !important;
+  border-color: #98a6b8 !important;
 }
