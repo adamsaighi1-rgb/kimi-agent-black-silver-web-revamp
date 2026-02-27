@@ -375,49 +375,49 @@ html[data-theme='light'] {
 }
 
 html[data-theme='light'] body {
-  background: #d8dee6;
-  color: #111827;
+  background: #efe6d8;
+  color: #2f2415;
 }
 
 html[data-theme='light'] ::-webkit-scrollbar-track {
-  background: #ccd4df;
+  background: #e7dbc8;
 }
 
 html[data-theme='light'] ::-webkit-scrollbar-thumb {
-  background: #b8c0cc;
+  background: #cbb89e;
 }
 
 html[data-theme='light'] ::selection {
   background: rgba(212, 168, 83, 0.25);
-  color: #111827;
+  color: #2f2415;
 }
 
 html[data-theme='light'] .loading-screen {
-  background: #d8dee6 !important;
+  background: #efe6d8 !important;
 }
 
 html[data-theme='light'] .glass-card {
-  background: rgba(223, 230, 239, 0.92);
-  border-color: rgba(212, 168, 83, 0.28);
+  background: rgba(246, 236, 221, 0.92);
+  border-color: rgba(181, 146, 94, 0.3);
 }
 
 html[data-theme='light'] [class*='bg-[#0a0a0a]'] {
-  background-color: #d8dee6 !important;
+  background-color: #efe6d8 !important;
 }
 
 html[data-theme='light'] [class*='bg-[#1a1a1a]'],
 html[data-theme='light'] [class*='bg-[#151515]'],
 html[data-theme='light'] [class*='bg-[#121212]'],
 html[data-theme='light'] [class*='bg-[#0f0f0f]'] {
-  background-color: #e1e7ef !important;
+  background-color: #f7efe3 !important;
 }
 
 html[data-theme='light'] [class*='bg-[#2d2d2d]'] {
-  background-color: #d4dce7 !important;
+  background-color: #e9dbc8 !important;
 }
 
 html[data-theme='light'] [class*='bg-white'] {
-  background-color: #e1e7ef !important;
+  background-color: #f7efe3 !important;
 }
 
 html[data-theme='light'] [class*='border-[#333333]'],
@@ -427,11 +427,11 @@ html[data-theme='light'] [class*='border-[#2c2c2c]'],
 html[data-theme='light'] [class*='border-[#2a2a2a]'],
 html[data-theme='light'] [class*='border-[#555555]'],
 html[data-theme='light'] [class*='border-[#5a5a5a]'] {
-  border-color: #bcc6d3 !important;
+  border-color: #d4c2ab !important;
 }
 
 html[data-theme='light'] [class*='text-white'] {
-  color: #172133 !important;
+  color: #2f2415 !important;
 }
 
 html[data-theme='light'] [class*='text-[#888888]'],
@@ -441,7 +441,7 @@ html[data-theme='light'] [class*='text-[#9a9a9a]'],
 html[data-theme='light'] [class*='text-white/70'],
 html[data-theme='light'] [class*='text-white/80'],
 html[data-theme='light'] [class*='text-white/90'] {
-  color: #4f5a6b !important;
+  color: #6a5a45 !important;
 }
 html[data-theme='light'] [class*='text-[#8f8f8f]'],
 html[data-theme='light'] [class*='text-[#b0b0b0]'],
@@ -449,7 +449,7 @@ html[data-theme='light'] [class*='text-[#b5b5b5]'],
 html[data-theme='light'] [class*='text-[#bbbbbb]'],
 html[data-theme='light'] [class*='text-[#d5d5d5]'],
 html[data-theme='light'] [class*='text-[#d6d6d6]'] {
-  color: #334155 !important;
+  color: #5f503d !important;
 }
 
 html[data-theme='light'] [class*='bg-gradient-to-t'][class*='from-[#0a0a0a]'] {
@@ -461,12 +461,12 @@ html[data-theme='light'] [class*='bg-gradient-to-r'][class*='from-[#0a0a0a]'] {
 }
 
 html[data-theme='light'] [class*='hover:bg-[#2d2d2d]']:hover {
-  background-color: #cfd8e4 !important;
+  background-color: #e2d2be !important;
 }
 
 html[data-theme='light'] [class*='hover:border-[#555555]']:hover,
 html[data-theme='light'] [class*='hover:border-[#5a5a5a]']:hover {
-  border-color: #98a6b8 !important;
+  border-color: #b08d64 !important;
 }
 
 
@@ -479,7 +479,7 @@ html[data-theme='light'] .image-banner [class*='text-[#9a9a9a]'],
 html[data-theme='light'] .image-banner [class*='text-white/70'],
 html[data-theme='light'] .image-banner [class*='text-white/80'],
 html[data-theme='light'] .image-banner [class*='text-white/90'] {
-  color: rgba(226, 232, 240, 0.9) !important;
+  color: rgba(248, 239, 226, 0.92) !important;
 }
 
 html[data-theme='light'] .image-banner .featured-overlay-x {
@@ -519,13 +519,15 @@ html[data-theme='light'] .readable-image-card .image-card-title {
 }
 
 html[data-theme='light'] .readable-image-card .image-card-subtitle {
-  color: rgba(226, 232, 240, 0.92) !important;
+  color: rgba(246, 236, 222, 0.92) !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 html[data-theme='light'] .group:hover .image-card-title {
   color: #d4a853 !important;
 }
+
+
 
 
 
