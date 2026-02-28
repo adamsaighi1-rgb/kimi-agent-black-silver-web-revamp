@@ -857,6 +857,152 @@ const publishIfPossible = async (documentsService: any, documentId: string, loca
   }
 };
 
+const unwrapRelationArray = (value: unknown) => {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is Record<string, unknown> => !!item && typeof item === 'object');
+  }
+
+  const entity = asRecord(value);
+
+  if (Array.isArray(entity.data)) {
+    return unwrapRelationArray(entity.data);
+  }
+
+  return [] as Record<string, unknown>[];
+};
+
+const unwrapSingleRelation = (value: unknown) => {
+  const directArray = unwrapRelationArray(value);
+  if (directArray.length > 0) {
+    return directArray[0];
+  }
+
+  const entity = asRecord(value);
+
+  if (entity.data && typeof entity.data === 'object') {
+    return asRecord(entity.data);
+  }
+
+  if (typeof entity.id === 'number' || typeof entity.documentId === 'string') {
+    return entity;
+  }
+
+  return null;
+};
+
+const relationId = (value: unknown) => {
+  const entity = unwrapSingleRelation(value);
+  return typeof entity?.id === 'number' ? entity.id : null;
+};
+
+const relationIds = (value: unknown) => {
+  return unwrapRelationArray(value)
+    .map((item) => item.id)
+    .filter((item): item is number => typeof item === 'number');
+};
+
+const hasMeaningfulMediaPayload = (value: unknown) => {
+  const entity = asRecord(value);
+  return ['images', 'files', 'videos', 'links'].some((key) => {
+    const items = entity[key];
+    return Array.isArray(items) && items.length > 0;
+  });
+};
+
+const mergeArrayField = (nextValue: unknown, existingValue: unknown) => {
+  if (Array.isArray(nextValue) && nextValue.length > 0) {
+    return nextValue;
+  }
+
+  if (Array.isArray(existingValue) && existingValue.length > 0) {
+    return existingValue;
+  }
+
+  return Array.isArray(nextValue) ? nextValue : [];
+};
+
+const mergeMediaField = (nextValue: unknown, existingValue: unknown) => {
+  if (hasMeaningfulMediaPayload(nextValue)) {
+    return normalizeMediaPayload(nextValue);
+  }
+
+  if (hasMeaningfulMediaPayload(existingValue)) {
+    return normalizeMediaPayload(existingValue);
+  }
+
+  return normalizeMediaPayload(nextValue);
+};
+
+const mergeRecordPreferIncoming = (existingValue: unknown, nextValue: unknown): Record<string, unknown> => {
+  const existing = asRecord(existingValue);
+  const next = asRecord(nextValue);
+  const merged: Record<string, unknown> = { ...existing };
+
+  for (const [key, value] of Object.entries(next)) {
+    if (value === undefined || value === null) {
+      continue;
+    }
+
+    if (typeof value === 'string') {
+      if (value.trim().length === 0 && typeof existing[key] === 'string' && String(existing[key]).trim().length > 0) {
+        continue;
+      }
+
+      merged[key] = value;
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      if (value.length === 0 && Array.isArray(existing[key]) && (existing[key] as unknown[]).length > 0) {
+        continue;
+      }
+
+      merged[key] = value;
+      continue;
+    }
+
+    if (typeof value === 'object') {
+      const incomingRecord = asRecord(value);
+      const existingRecord = asRecord(existing[key]);
+
+      if (Object.keys(incomingRecord).length === 0 && Object.keys(existingRecord).length > 0) {
+        continue;
+      }
+
+      merged[key] =
+        Object.keys(existingRecord).length > 0
+          ? mergeRecordPreferIncoming(existingRecord, incomingRecord)
+          : incomingRecord;
+      continue;
+    }
+
+    merged[key] = value;
+  }
+
+  return merged;
+};
+
+const getExistingPropertySnapshot = async (strapi: Core.Strapi, seedKey: string) => {
+  const uid = 'api::property.property';
+
+  const existing = await strapi.db.query(uid).findOne({
+    where: {
+      seedKey,
+      locale: 'en',
+    },
+    populate: {
+      image: true,
+      gallery: true,
+      generalPlanImage: true,
+      developerLogo: true,
+      brokerLogo: true,
+      brochures: true,
+    },
+  });
+
+  return existing ? asRecord(existing) : null;
+};
+
 const upsertPropertyByLocale = async (
   strapi: Core.Strapi,
   locale: LocaleCode,
@@ -1143,12 +1289,19 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
   const importedProperties: Array<Record<string, unknown>> = [];
   const keepPropertySeedKeys = new Set<string>();
   const districtStats = new Map<string, DistrictStats>();
+  let hadImportFailures = false;
 
   for (let index = 0; index < ids.length; index += 1) {
     const id = ids[index];
+    const expectedSeedKey = `reelly-${id}`;
+    keepPropertySeedKeys.add(expectedSeedKey);
     strapi.log.info(`Reelly import progress ${index + 1}/${ids.length}: project ${id}`);
 
-    const project = await requestJson<ReellyProjectDetail>(resolveDetailUrl(id), {
+    try {
+      const existingProperty = await getExistingPropertySnapshot(strapi, expectedSeedKey);
+      const existingSourceData = asRecord(existingProperty?.sourceData);
+
+      let project = await requestJson<ReellyProjectDetail>(resolveDetailUrl(id), {
       method: 'GET',
       headers: reellyHeaders(token),
     });
@@ -1185,6 +1338,21 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
       (project as Record<string, unknown>).reellyUnits = [];
     }
 
+    const mergedProjectRecord = mergeRecordPreferIncoming(existingSourceData, project as Record<string, unknown>);
+    mergedProjectRecord.reellyMedia = mergeMediaField(
+      (project as Record<string, unknown>).reellyMedia,
+      existingSourceData.reellyMedia
+    );
+    mergedProjectRecord.reellyPaymentPlans = mergeArrayField(
+      (project as Record<string, unknown>).reellyPaymentPlans,
+      existingSourceData.reellyPaymentPlans
+    );
+    mergedProjectRecord.reellyUnits = mergeArrayField(
+      (project as Record<string, unknown>).reellyUnits,
+      existingSourceData.reellyUnits
+    );
+    project = mergedProjectRecord as ReellyProjectDetail;
+
     const mediaObject = asRecord((project as Record<string, unknown>).reellyMedia);
     const mediaImageCount = Array.isArray(mediaObject.images) ? (mediaObject.images as unknown[]).length : 0;
     const mediaFileCount = Array.isArray(mediaObject.files) ? (mediaObject.files as unknown[]).length : 0;
@@ -1218,6 +1386,11 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
       coverMediaId = await ensureUploadedFile(strapi, coverLocalPath);
     }
 
+    const existingCoverMediaId = relationId(existingProperty?.image);
+    if (!coverMediaId && existingCoverMediaId) {
+      coverMediaId = existingCoverMediaId;
+    }
+
     if (!coverMediaId && fallbackImage?.id) {
       coverMediaId = fallbackImage.id as number;
     }
@@ -1249,6 +1422,11 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
       galleryLocalPaths.push(toRelativePath(downloadedPath));
     }
 
+    const existingGalleryMediaIds = relationIds(existingProperty?.gallery);
+    if (existingGalleryMediaIds.length > galleryMediaIds.length) {
+      galleryMediaIds.push(...existingGalleryMediaIds.filter((mediaId) => !galleryMediaIds.includes(mediaId)));
+    }
+
     if (!galleryMediaIds.includes(coverMediaId)) {
       galleryMediaIds.unshift(coverMediaId);
 
@@ -1257,7 +1435,7 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
       }
     }
 
-    const amenityDetails: Array<Record<string, unknown>> = [];
+    let amenityDetails: Array<Record<string, unknown>> = [];
 
     for (const amenity of project.amenities ?? []) {
       const name = amenity.amenity?.name;
@@ -1281,24 +1459,44 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
       });
     }
 
+    const existingAmenityDetails = Array.isArray(existingProperty?.amenityDetails)
+      ? (existingProperty.amenityDetails as Array<Record<string, unknown>>)
+      : [];
+
+    if (amenityDetails.length === 0 && existingAmenityDetails.length > 0) {
+      amenityDetails = [...existingAmenityDetails];
+    }
+
     const generalPlanUrl = getNestedImageUrl((project as Record<string, unknown>).general_plan);
     const generalPlanLocalPath = generalPlanUrl
       ? await downloadToFile(generalPlanUrl, `${String(id).padStart(4, '0')}-${slug}-general-plan`, PLAN_DIR)
       : null;
-    const generalPlanMediaId = generalPlanLocalPath ? (await ensureUploadedFile(strapi, generalPlanLocalPath)) ?? null : null;
+    let generalPlanMediaId = generalPlanLocalPath ? (await ensureUploadedFile(strapi, generalPlanLocalPath)) ?? null : null;
 
     const developerLogoUrl = getNestedImageUrl((project.developer as Record<string, unknown> | undefined)?.logo);
     const developerLogoLocalPath = developerLogoUrl
       ? await downloadToFile(developerLogoUrl, `${String(id).padStart(4, '0')}-${slug}-developer-logo`, LOGO_DIR)
       : null;
-    const developerLogoMediaId = developerLogoLocalPath ? (await ensureUploadedFile(strapi, developerLogoLocalPath)) ?? null : null;
+    let developerLogoMediaId = developerLogoLocalPath ? (await ensureUploadedFile(strapi, developerLogoLocalPath)) ?? null : null;
 
     const brokerObject = (project as Record<string, unknown>).broker as Record<string, unknown> | undefined;
     const brokerLogoUrl = getNestedImageUrl(brokerObject?.logo);
     const brokerLogoLocalPath = brokerLogoUrl
       ? await downloadToFile(brokerLogoUrl, `${String(id).padStart(4, '0')}-${slug}-broker-logo`, LOGO_DIR)
       : null;
-    const brokerLogoMediaId = brokerLogoLocalPath ? (await ensureUploadedFile(strapi, brokerLogoLocalPath)) ?? null : null;
+    let brokerLogoMediaId = brokerLogoLocalPath ? (await ensureUploadedFile(strapi, brokerLogoLocalPath)) ?? null : null;
+
+    if (!generalPlanMediaId) {
+      generalPlanMediaId = relationId(existingProperty?.generalPlanImage);
+    }
+
+    if (!developerLogoMediaId) {
+      developerLogoMediaId = relationId(existingProperty?.developerLogo);
+    }
+
+    if (!brokerLogoMediaId) {
+      brokerLogoMediaId = relationId(existingProperty?.brokerLogo);
+    }
 
     const brochureUrls = [...new Set(collectDocumentUrls(project))];
     const brochureMediaIds: number[] = [];
@@ -1321,6 +1519,11 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
       brochureLocalPaths.push(toRelativePath(brochurePath));
     }
 
+    const existingBrochureMediaIds = relationIds(existingProperty?.brochures);
+    if (existingBrochureMediaIds.length > brochureMediaIds.length) {
+      brochureMediaIds.push(...existingBrochureMediaIds.filter((mediaId) => !brochureMediaIds.includes(mediaId)));
+    }
+
     const payload = buildPropertyPayload(
       project,
       index,
@@ -1336,7 +1539,9 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
       brochureMediaIds
     );
 
-    keepPropertySeedKeys.add(String(payload.seedKey));
+    if (String(payload.description ?? '').trim().length === 0 && typeof existingProperty?.description === 'string') {
+      payload.description = existingProperty.description;
+    }
 
     for (const locale of LOCALES) {
       await upsertPropertyByLocale(strapi, locale, String(payload.seedKey), payload);
@@ -1378,36 +1583,49 @@ export const importReellyProperties = async (strapi: Core.Strapi) => {
     });
 
     strapi.log.info(`Reelly import saved project ${id} (${index + 1}/${ids.length}).`);
+    } catch (error) {
+      hadImportFailures = true;
+      strapi.log.error(`Project ${id}: import failed (${errorMessage(error)}).`);
+    }
 
     if (REELLY_PAUSE_MS > 0) {
       await pause(REELLY_PAUSE_MS);
     }
   }
 
-  await cleanupNonImportedProperties(strapi, keepPropertySeedKeys);
+  let neighborhoodPayloads: NeighborhoodPayload[] = [];
 
-  const neighborhoodPayloads = buildNeighborhoodPayloads(districtStats);
-  const keepNeighborhoodSeedKeys = new Set<string>();
+  if (hadImportFailures) {
+    strapi.log.warn('Reelly import completed with partial failures. Cleanup and neighborhood sync were skipped to avoid data loss.');
+  } else {
+    await cleanupNonImportedProperties(strapi, keepPropertySeedKeys);
 
-  for (const neighborhood of neighborhoodPayloads) {
-    keepNeighborhoodSeedKeys.add(neighborhood.seedKey);
+    neighborhoodPayloads = buildNeighborhoodPayloads(districtStats);
+    const keepNeighborhoodSeedKeys = new Set<string>();
 
-    for (const locale of LOCALES) {
-      await upsertNeighborhoodByLocale(strapi, locale, neighborhood.seedKey, neighborhood);
+    for (const neighborhood of neighborhoodPayloads) {
+      keepNeighborhoodSeedKeys.add(neighborhood.seedKey);
+
+      for (const locale of LOCALES) {
+        await upsertNeighborhoodByLocale(strapi, locale, neighborhood.seedKey, neighborhood);
+      }
     }
+
+    await cleanupNonImportedNeighborhoods(strapi, keepNeighborhoodSeedKeys);
+    await syncHomePageAreaFilters(
+      strapi,
+      neighborhoodPayloads.map((item) => item.name)
+    );
+
+    await fs.writeFile(NEIGHBORHOOD_EXPORT_FILE, JSON.stringify(neighborhoodPayloads, null, 2), 'utf-8');
   }
 
-  await cleanupNonImportedNeighborhoods(strapi, keepNeighborhoodSeedKeys);
-  await syncHomePageAreaFilters(
-    strapi,
-    neighborhoodPayloads.map((item) => item.name)
-  );
-
   await fs.writeFile(EXPORT_FILE, JSON.stringify(importedProperties, null, 2), 'utf-8');
-  await fs.writeFile(NEIGHBORHOOD_EXPORT_FILE, JSON.stringify(neighborhoodPayloads, null, 2), 'utf-8');
 
   strapi.log.info(
-    `Reelly import completed. Imported ${importedProperties.length} projects and ${neighborhoodPayloads.length} neighborhoods.`
+    hadImportFailures
+      ? `Reelly import saved ${importedProperties.length} projects with partial failures.`
+      : `Reelly import completed. Imported ${importedProperties.length} projects and ${neighborhoodPayloads.length} neighborhoods.`
   );
 };
 
