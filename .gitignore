@@ -46,3 +46,8 @@ cms/public/uploads/
 tmp_*.txt
 
 cms/imports/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
